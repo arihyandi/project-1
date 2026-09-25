@@ -1,0 +1,796 @@
+<title>Detektif Pola</title>
+<meta name="description" content="Game sederhana untuk melatih pengenalan pola (berpikir komputasional).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Lexend:wght@400;500;600&family=JetBrains+Mono:wght@600;700&display=swap">
+<style>
+  :root {
+    --paper: #EEF3F8;
+    --grid: rgba(47, 107, 255, 0.09);
+    --card: #FFFFFF;
+    --tile: #F6F8FC;
+    --line: #D3DCEA;
+    --ink: #17233A;
+    --muted: #5A6A85;
+    --accent: #2F6BFF;
+    --accent-ink: #FFFFFF;
+    --marker: #FFD84D;
+    --good: #188A5C;
+    --good-bg: #E3F5EC;
+    --bad: #C93A3A;
+    --bad-bg: #FBE7E7;
+    --shadow: 0 1px 0 rgba(23, 35, 58, 0.06), 0 8px 24px -12px rgba(23, 35, 58, 0.25);
+    --display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+    --body: "Lexend", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #0E1522;
+      --grid: rgba(120, 160, 255, 0.07);
+      --card: #172134;
+      --tile: #1E2A40;
+      --line: #2C3A55;
+      --ink: #E6ECF6;
+      --muted: #9AA8C2;
+      --accent: #6C95FF;
+      --accent-ink: #0B1220;
+      --marker: #E8C23A;
+      --good: #4FD1A0;
+      --good-bg: #133528;
+      --bad: #FF7B7B;
+      --bad-bg: #3A1C22;
+      --shadow: 0 1px 0 rgba(0, 0, 0, 0.3), 0 10px 28px -14px rgba(0, 0, 0, 0.7);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #0E1522;
+    --grid: rgba(120, 160, 255, 0.07);
+    --card: #172134;
+    --tile: #1E2A40;
+    --line: #2C3A55;
+    --ink: #E6ECF6;
+    --muted: #9AA8C2;
+    --accent: #6C95FF;
+    --accent-ink: #0B1220;
+    --marker: #E8C23A;
+    --good: #4FD1A0;
+    --good-bg: #133528;
+    --bad: #FF7B7B;
+    --bad-bg: #3A1C22;
+    --shadow: 0 1px 0 rgba(0, 0, 0, 0.3), 0 10px 28px -14px rgba(0, 0, 0, 0.7);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 24px 24px;
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.55;
+    min-height: 100vh;
+  }
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding-inline: 16px;
+    padding-block: 28px 48px;
+    display: grid;
+    gap: 20px;
+  }
+
+  /* Header */
+  header { display: grid; gap: 6px; }
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  h1 {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(40px, 8vw, 60px);
+    line-height: 0.95;
+    margin: 0;
+    text-wrap: balance;
+  }
+  h1 .hl {
+    background: linear-gradient(transparent 58%, var(--marker) 58%, var(--marker) 90%, transparent 90%);
+    padding-inline: 4px;
+  }
+  .lede { margin: 4px 0 0; color: var(--muted); max-width: 60ch; }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .levels {
+    display: inline-flex;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 4px;
+    gap: 2px;
+  }
+  .levels button {
+    font: 600 14px/1 var(--body);
+    color: var(--muted);
+    background: transparent;
+    border: 0;
+    border-radius: 999px;
+    padding: 9px 16px;
+    cursor: pointer;
+  }
+  .levels button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  .levels button:hover:not([aria-pressed="true"]) { color: var(--ink); }
+  .stats { display: flex; gap: 18px; font-size: 13px; color: var(--muted); }
+  .stats b {
+    display: block;
+    font-family: var(--mono);
+    font-size: 20px;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+  }
+
+  .pips { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+  .pip { height: 8px; border-radius: 4px; background: var(--line); }
+  .pip.ok { background: var(--good); }
+  .pip.no { background: var(--bad); }
+  .pip.now { background: var(--accent); }
+
+  /* Board */
+  .board {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    padding: clamp(18px, 4vw, 32px);
+    display: grid;
+    gap: 22px;
+  }
+  .q-head { display: grid; gap: 8px; }
+  .chip {
+    justify-self: start;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: var(--marker);
+    border-radius: 6px;
+    padding: 3px 9px;
+  }
+  .prompt {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(22px, 4vw, 28px);
+    line-height: 1.15;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .seq {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+  .tile {
+    --size: clamp(52px, 11vw, 72px);
+    min-width: var(--size);
+    height: var(--size);
+    padding-inline: 8px;
+    display: grid;
+    place-items: center;
+    background: var(--tile);
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: clamp(20px, 4.4vw, 28px);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .tile svg { width: 72%; height: 72%; display: block; }
+  .tile.missing {
+    border: 2px dashed var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-family: var(--display);
+    font-size: clamp(26px, 5vw, 34px);
+  }
+  .tile.filled-ok { border: 2px solid var(--good); background: var(--good-bg); }
+  .tile.filled-bad { border: 2px solid var(--bad); background: var(--bad-bg); }
+  .seq .tile { animation: pop 320ms cubic-bezier(.2,.9,.3,1.3) both; animation-delay: calc(var(--i) * 45ms); }
+  @keyframes pop { from { transform: scale(0.6); opacity: 0.2; } to { transform: none; opacity: 1; } }
+
+  .opts-label { font-size: 13px; color: var(--muted); margin: 0 0 -12px; }
+  .opts {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .opt {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 92px;
+    padding: 12px 8px;
+    background: var(--tile);
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    cursor: pointer;
+    color: var(--ink);
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: clamp(22px, 4.6vw, 30px);
+    transition: transform 120ms ease, border-color 120ms ease;
+  }
+  .opt svg { width: 52px; height: 52px; display: block; }
+  .opt:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--accent); }
+  .opt:focus-visible, .levels button:focus-visible, .btn:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .opt .k {
+    position: absolute;
+    top: 6px;
+    left: 9px;
+    font: 600 11px/1 var(--body);
+    color: var(--muted);
+  }
+  .opt:disabled { cursor: default; }
+  .opt.is-ok { border: 2px solid var(--good); background: var(--good-bg); }
+  .opt.is-bad { border: 2px solid var(--bad); background: var(--bad-bg); animation: shake 300ms ease; }
+  .opt.dim { opacity: 0.45; }
+  @keyframes shake {
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-3px); }
+  }
+
+  .feedback {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px 20px;
+    align-items: center;
+    border-radius: 14px;
+    padding: 16px 18px;
+  }
+  .feedback.ok { background: var(--good-bg); }
+  .feedback.bad { background: var(--bad-bg); }
+  .feedback h3 { margin: 0; font-family: var(--display); font-size: 22px; line-height: 1.1; }
+  .feedback.ok h3 { color: var(--good); }
+  .feedback.bad h3 { color: var(--bad); }
+  .feedback p { margin: 4px 0 0; max-width: 62ch; }
+
+  .btn {
+    font: 600 15px/1 var(--body);
+    border: 0;
+    border-radius: 12px;
+    padding: 14px 20px;
+    cursor: pointer;
+    background: var(--accent);
+    color: var(--accent-ink);
+    white-space: nowrap;
+  }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line); }
+
+  /* Result */
+  .result { display: grid; gap: 14px; justify-items: start; }
+  .result .big {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(56px, 12vw, 88px);
+    line-height: 0.9;
+    font-variant-numeric: tabular-nums;
+  }
+  .result .big small { font-size: 0.4em; color: var(--muted); font-weight: 700; }
+  .stars { display: flex; gap: 6px; }
+  .stars svg { width: 40px; height: 40px; }
+  .result p { margin: 0; max-width: 60ch; }
+  .result .row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  /* Teacher note */
+  .note {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    font-size: 14px;
+    color: var(--muted);
+    border-top: 1.5px dashed var(--line);
+    padding-top: 18px;
+  }
+  .note h2 {
+    font-family: var(--display);
+    font-size: 18px;
+    color: var(--ink);
+    margin: 0 0 4px;
+  }
+  .note p, .note ul { margin: 0; }
+  .note ul { padding-left: 18px; }
+  kbd {
+    font-family: var(--mono);
+    font-size: 12px;
+    border: 1px solid var(--line);
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    padding: 0 5px;
+    background: var(--card);
+    color: var(--ink);
+  }
+
+  @media (max-width: 560px) {
+    .opts { grid-template-columns: repeat(2, 1fr); }
+    .feedback { grid-template-columns: 1fr; }
+    .feedback .btn { justify-self: start; }
+    .stats { gap: 14px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Berpikir Komputasional · Pengenalan Pola</span>
+    <h1>Detektif <span class="hl">Pola</span></h1>
+    <p class="lede">Amati urutannya, temukan aturan yang berulang, lalu pilih yang mengisi kotak bertanda&nbsp;<b>?</b>. Satu ronde berisi 10 soal.</p>
+  </header>
+
+  <div class="toolbar">
+    <div class="levels" role="group" aria-label="Pilih tingkat">
+      <button type="button" id="lv-mudah" data-level="mudah">Mudah</button>
+      <button type="button" id="lv-sedang" data-level="sedang">Sedang</button>
+      <button type="button" id="lv-sulit" data-level="sulit">Sulit</button>
+    </div>
+    <div class="stats" aria-live="polite">
+      <div>Soal<b id="st-q">1/10</b></div>
+      <div>Benar<b id="st-ok">0</b></div>
+      <div>Beruntun<b id="st-streak">0</b></div>
+      <div>Terbaik<b id="st-best">–</b></div>
+    </div>
+  </div>
+
+  <div class="pips" id="pips" aria-hidden="true"></div>
+
+  <main class="board" id="board"></main>
+
+  <section class="note">
+    <div>
+      <h2>Apa itu pengenalan pola?</h2>
+      <p>Pengenalan pola adalah kemampuan menemukan kesamaan atau keteraturan, misalnya unit yang berulang atau perubahan yang tetap. Setelah aturannya ketemu, kita bisa menebak langkah berikutnya tanpa mencoba satu per satu.</p>
+    </div>
+    <div>
+      <h2>Tips di kelas</h2>
+      <ul>
+        <li>Minta siswa menyebutkan aturannya dengan kata-kata sendiri sebelum menekan jawaban.</li>
+        <li>Baca penjelasan setelah setiap soal, lalu diskusikan.</li>
+        <li>Pintasan: tombol <kbd>1</kbd>–<kbd>4</kbd> memilih jawaban, <kbd>Enter</kbd> lanjut.</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  // ---------- Data ----------
+  const COLORS = [
+    { id: "merah", hex: "#E5484D" },
+    { id: "biru", hex: "#2F6BFF" },
+    { id: "kuning", hex: "#F2B01E" },
+    { id: "hijau", hex: "#1FA36B" },
+    { id: "ungu", hex: "#8B5CF6" },
+  ];
+  const SHAPES = ["lingkaran", "persegi", "segitiga", "belah ketupat", "bintang"];
+  const DIRS = { 0: "atas", 45: "kanan atas", 90: "kanan", 135: "kanan bawah", 180: "bawah", 225: "kiri bawah", 270: "kiri", 315: "kiri atas" };
+  const TOTAL = 10;
+
+  const starPts = (() => {
+    const p = [];
+    for (let i = 0; i < 10; i++) {
+      const r = i % 2 ? 18 : 42;
+      const a = -Math.PI / 2 + (i * Math.PI) / 5;
+      p.push((50 + r * Math.cos(a)).toFixed(1) + "," + (53 + r * Math.sin(a)).toFixed(1));
+    }
+    return p.join(" ");
+  })();
+
+  // ---------- Helpers ----------
+  const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  const shuffle = (arr) => {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  const sample = (arr, k) => shuffle(arr).slice(0, k);
+  const key = (it) => JSON.stringify(it);
+  const hexOf = (id) => COLORS.find((c) => c.id === id).hex;
+
+  function nameOf(it) {
+    if (it.t === "s") return it.shape + " " + it.color;
+    if (it.t === "a") return "panah ke " + DIRS[it.rot];
+    return String(it.v);
+  }
+  const N = (v) => ({ t: "n", v });
+  const L = (code) => ({ t: "l", v: String.fromCharCode(code) });
+
+  // Build 4 options: answer + first 3 unique distractors from pool.
+  function buildOpts(ans, pool) {
+    const seen = new Set([key(ans)]);
+    const out = [ans];
+    for (const p of pool) {
+      const k = key(p);
+      if (seen.has(k)) continue;
+      seen.add(k);
+      out.push(p);
+      if (out.length === 4) break;
+    }
+    return shuffle(out);
+  }
+  function numPool(ans, d) {
+    const c = [ans + 1, ans - 1, ans + d, ans - d, ans + 2, ans - 2, ans + 10, ans + 2 * d];
+    return shuffle(c.filter((v) => v >= 0 && v !== ans)).map(N);
+  }
+  function make(cat, seq, hide, explain, pool) {
+    const ans = seq[hide];
+    return { cat, seq, hide, ansKey: key(ans), opts: buildOpts(ans, pool), explain };
+  }
+  const list = (arr) => arr.join(", ");
+
+  // ---------- Generators ----------
+  function genWarna() {
+    const tpl = pick(["AB", "AAB", "ABB", "ABC", "AABB"]);
+    const cols = sample(COLORS, 3);
+    const shape = pick(["lingkaran", "persegi", "bintang"]);
+    const unit = [...tpl].map((ch) => ({ t: "s", shape, color: cols[ch.charCodeAt(0) - 65].id }));
+    const len = Math.min(unit.length * 2 + rnd(1, unit.length), 9);
+    const seq = Array.from({ length: len }, (_, i) => unit[i % unit.length]);
+    const ans = seq[len - 1];
+    const pool = shuffle(COLORS.map((c) => ({ t: "s", shape, color: c.id })));
+    return make("Pola Warna", seq, len - 1,
+      `Unit polanya adalah <b>${list(unit.map((u) => u.color))}</b>, lalu diulang terus. Jadi kotak ke-${len} adalah <b>${ans.color}</b>.`, pool);
+  }
+
+  function genBentuk() {
+    const tpl = pick(["AB", "ABC", "AAB", "ABCD"]);
+    const shapes = sample(SHAPES, 4);
+    const color = pick(COLORS).id;
+    const unit = [...tpl].map((ch) => ({ t: "s", shape: shapes[ch.charCodeAt(0) - 65], color }));
+    const len = Math.min(unit.length * 2 + rnd(1, unit.length), 9);
+    const seq = Array.from({ length: len }, (_, i) => unit[i % unit.length]);
+    const ans = seq[len - 1];
+    const pool = shuffle(SHAPES.map((s) => ({ t: "s", shape: s, color })));
+    return make("Pola Bentuk", seq, len - 1,
+      `Bentuknya berulang dengan unit <b>${list(unit.map((u) => u.shape))}</b> (${unit.length} bentuk). Kotak ke-${len} adalah <b>${ans.shape}</b>.`, pool);
+  }
+
+  function genKombinasi(middle) {
+    const sh = sample(SHAPES, 3).slice(0, 2);
+    const co = sample(COLORS, 3).map((c) => c.id);
+    const len = rnd(7, 9);
+    const seq = Array.from({ length: len }, (_, i) => ({ t: "s", shape: sh[i % 2], color: co[i % 3] }));
+    const hide = middle ? rnd(2, len - 2) : len - 1;
+    const ans = seq[hide];
+    const near = shuffle([
+      ...co.filter((c) => c !== ans.color).map((c) => ({ t: "s", shape: ans.shape, color: c })),
+      ...sh.filter((s) => s !== ans.shape).map((s) => ({ t: "s", shape: s, color: ans.color })),
+    ]);
+    const far = shuffle(COLORS.map((c) => ({ t: "s", shape: pick(SHAPES), color: c.id })));
+    return make("Pola Ganda", seq, hide,
+      `Ada dua pola sekaligus. Bentuk berulang tiap 2 (<b>${list(sh)}</b>) dan warna berulang tiap 3 (<b>${list(co)}</b>). Posisi ke-${hide + 1} jadi <b>${nameOf(ans)}</b>.`,
+      near.concat(far));
+  }
+
+  function genRotasi() {
+    const step = pick([45, 90, -90, 135]);
+    const start = pick([0, 45, 90, 135, 180, 225, 270, 315]);
+    const len = rnd(5, 6);
+    const norm = (a) => ((a % 360) + 360) % 360;
+    const seq = Array.from({ length: len }, (_, i) => ({ t: "a", rot: norm(start + step * i) }));
+    const ans = seq[len - 1];
+    const pool = shuffle([norm(ans.rot + step), norm(ans.rot - step), norm(ans.rot + 180), norm(ans.rot + 45), norm(ans.rot - 45)])
+      .map((r) => ({ t: "a", rot: r }));
+    const arah = step > 0 ? "searah jarum jam" : "berlawanan arah jarum jam";
+    return make("Pola Putaran", seq, len - 1,
+      `Panah berputar <b>${Math.abs(step)}° ${arah}</b> setiap langkah. Jadi panah terakhir menghadap <b>${DIRS[ans.rot]}</b>.`, pool);
+  }
+
+  function genTambah() {
+    const a = rnd(1, 10), d = rnd(2, 5), len = 5;
+    const seq = Array.from({ length: len }, (_, i) => N(a + d * i));
+    const ans = seq[len - 1].v;
+    return make("Pola Bilangan", seq, len - 1,
+      `Setiap angka <b>ditambah ${d}</b>: ${seq.slice(0, -1).map((x) => x.v).join(" → ")} → <b>${ans}</b>.`, numPool(ans, d));
+  }
+
+  function genKurang() {
+    const d = rnd(3, 7), len = 5, a = rnd(d * len + 2, d * len + 25);
+    const seq = Array.from({ length: len }, (_, i) => N(a - d * i));
+    const ans = seq[len - 1].v;
+    return make("Pola Bilangan", seq, len - 1,
+      `Setiap angka <b>dikurangi ${d}</b>. ${seq[len - 2].v} − ${d} = <b>${ans}</b>.`, numPool(ans, d));
+  }
+
+  function genHuruf() {
+    const step = rnd(1, 3), len = 5;
+    const start = rnd(65, 90 - step * (len - 1));
+    const seq = Array.from({ length: len }, (_, i) => L(start + step * i));
+    const ansCode = start + step * (len - 1);
+    const pool = shuffle([1, -1, 2, -2, 3, -3, -4, step + 1, -step].map((o) => ansCode + o).filter((c) => c >= 65 && c <= 90)).map(L);
+    const lompat = step === 1 ? "maju 1 huruf (berurutan)" : `maju ${step} huruf (melewati ${step - 1} huruf)`;
+    return make("Pola Huruf", seq, len - 1,
+      `Setiap huruf <b>${lompat}</b> di alfabet. Setelah ${seq[len - 2].v} adalah <b>${seq[len - 1].v}</b>.`, pool);
+  }
+
+  function genBertumbuh() {
+    const a = rnd(1, 6), len = 6;
+    const seq = [N(a)];
+    for (let i = 1; i < len; i++) seq.push(N(seq[i - 1].v + i));
+    const ans = seq[len - 1].v;
+    return make("Pola Bertumbuh", seq, len - 1,
+      `Selisihnya terus bertambah: +1, +2, +3, +4, lalu <b>+${len - 1}</b>. ${seq[len - 2].v} + ${len - 1} = <b>${ans}</b>.`, numPool(ans, len - 2));
+  }
+
+  function genGeometri() {
+    const r = pick([2, 3]), a = rnd(1, r === 2 ? 5 : 3), len = 5;
+    const seq = Array.from({ length: len }, (_, i) => N(a * r ** i));
+    const ans = seq[len - 1].v;
+    const prev = seq[len - 2].v;
+    const pool = shuffle([prev + (prev - seq[len - 3].v), ans + r, ans - r, prev * (r + 1), ans + 1].filter((v) => v !== ans)).map(N).concat(numPool(ans, r));
+    return make("Pola Perkalian", seq, len - 1,
+      `Setiap angka <b>dikali ${r}</b>. ${prev} × ${r} = <b>${ans}</b>.`, pool);
+  }
+
+  function genFibo() {
+    const a = rnd(1, 3), b = rnd(a, a + 3), len = 7;
+    const seq = [N(a), N(b)];
+    for (let i = 2; i < len; i++) seq.push(N(seq[i - 1].v + seq[i - 2].v));
+    const ans = seq[len - 1].v, p1 = seq[len - 2].v, p2 = seq[len - 3].v;
+    return make("Pola Penjumlahan", seq, len - 1,
+      `Setiap angka adalah <b>jumlah dua angka sebelumnya</b> (mirip deret Fibonacci). ${p2} + ${p1} = <b>${ans}</b>.`,
+      numPool(ans, p1 - p2));
+  }
+
+  function genKuadrat() {
+    const s = rnd(1, 4), len = 5;
+    const seq = Array.from({ length: len }, (_, i) => N((s + i) ** 2));
+    const n = s + len - 1, ans = n * n;
+    return make("Bilangan Kuadrat", seq, len - 1,
+      `Ini bilangan kuadrat: ${s}×${s}, ${s + 1}×${s + 1}, dan seterusnya. Berikutnya <b>${n}×${n} = ${ans}</b>.`,
+      numPool(ans, 2 * n - 1));
+  }
+
+  function genSelang() {
+    const pair = pick([["+", 3, "−", 1], ["+", 5, "−", 2], ["×", 2, "+", 1], ["+", 4, "−", 3]]);
+    const op = (v, o, n) => (o === "+" ? v + n : o === "−" ? v - n : v * n);
+    const len = 7;
+    const seq = [N(pair[0] === "×" ? rnd(1, 3) : rnd(2, 10))];
+    for (let i = 1; i < len; i++) {
+      const odd = i % 2 === 1;
+      seq.push(N(op(seq[i - 1].v, odd ? pair[0] : pair[2], odd ? pair[1] : pair[3])));
+    }
+    const ans = seq[len - 1].v;
+    const lastOp = (len - 1) % 2 === 1 ? pair[0] + pair[1] : pair[2] + pair[3];
+    return make("Pola Selang-seling", seq, len - 1,
+      `Operasinya bergantian: <b>${pair[0]}${pair[1]}</b>, lalu <b>${pair[2]}${pair[3]}</b>, lalu ulang. Langkah terakhir ${lastOp}, jadi <b>${ans}</b>.`,
+      numPool(ans, pair[1]));
+  }
+
+  function genTengah() {
+    const a = rnd(3, 20), d = rnd(6, 12), len = 6;
+    const seq = Array.from({ length: len }, (_, i) => N(a + d * i));
+    const hide = rnd(1, len - 2);
+    const ans = seq[hide].v;
+    return make("Bagian yang Hilang", seq, hide,
+      `Setiap angka <b>ditambah ${d}</b>. ${seq[hide - 1].v} + ${d} = <b>${ans}</b>, dan ${ans} + ${d} = ${seq[hide + 1].v}.`, numPool(ans, d));
+  }
+
+  const LEVELS = {
+    mudah: [genWarna, genBentuk, genTambah, genHuruf],
+    sedang: [() => genKombinasi(false), genRotasi, genKurang, genBertumbuh, genHuruf],
+    sulit: [genGeometri, genFibo, genKuadrat, genSelang, genTengah, () => genKombinasi(true)],
+  };
+
+  function buildRound(level) {
+    const gens = LEVELS[level];
+    let order = [];
+    while (order.length < TOTAL) order = order.concat(shuffle(gens));
+    return order.slice(0, TOTAL).map((g) => g());
+  }
+
+  // ---------- Rendering ----------
+  function itemHTML(it) {
+    if (it.t === "s") {
+      const f = hexOf(it.color);
+      let body;
+      switch (it.shape) {
+        case "lingkaran": body = `<circle cx="50" cy="50" r="38" fill="${f}"/>`; break;
+        case "persegi": body = `<rect x="14" y="14" width="72" height="72" rx="8" fill="${f}"/>`; break;
+        case "segitiga": body = `<polygon points="50,10 91,86 9,86" fill="${f}" stroke="${f}" stroke-width="4" stroke-linejoin="round"/>`; break;
+        case "belah ketupat": body = `<polygon points="50,6 90,50 50,94 10,50" fill="${f}"/>`; break;
+        default: body = `<polygon points="${starPts}" fill="${f}" stroke="${f}" stroke-width="3" stroke-linejoin="round"/>`;
+      }
+      return `<svg viewBox="0 0 100 100" role="img" aria-label="${nameOf(it)}">${body}</svg>`;
+    }
+    if (it.t === "a") {
+      return `<svg viewBox="0 0 100 100" role="img" aria-label="${nameOf(it)}"><path d="M50 10 L84 48 H62 V90 H38 V48 H16 Z" fill="currentColor" transform="rotate(${it.rot} 50 50)"/></svg>`;
+    }
+    return `<span>${it.v}</span>`;
+  }
+
+  const $ = (id) => document.getElementById(id);
+  const board = $("board");
+  let state;
+
+  const store = {
+    get() { try { return JSON.parse(localStorage.getItem("detektif-pola-best") || "{}"); } catch { return {}; } },
+    set(v) { try { localStorage.setItem("detektif-pola-best", JSON.stringify(v)); } catch {} },
+  };
+
+  function newRound(level) {
+    state = { level, qs: buildRound(level), i: 0, correct: 0, streak: 0, maxStreak: 0, results: [], answered: null, done: false };
+    render();
+  }
+
+  function renderStats() {
+    document.querySelectorAll(".levels button").forEach((b) =>
+      b.setAttribute("aria-pressed", String(b.dataset.level === state.level)));
+    $("st-q").textContent = `${Math.min(state.i + 1, TOTAL)}/${TOTAL}`;
+    $("st-ok").textContent = state.correct;
+    $("st-streak").textContent = state.streak;
+    const best = store.get()[state.level];
+    $("st-best").textContent = best == null ? "–" : `${best}/${TOTAL}`;
+    $("pips").innerHTML = Array.from({ length: TOTAL }, (_, k) => {
+      const r = state.results[k];
+      const cls = r === true ? "ok" : r === false ? "no" : k === state.i && !state.done ? "now" : "";
+      return `<div class="pip ${cls}"></div>`;
+    }).join("");
+  }
+
+  function render() {
+    renderStats();
+    if (state.done) return renderResult();
+    const q = state.qs[state.i];
+    const a = state.answered;
+    const ans = q.seq[q.hide];
+
+    const seqHTML = q.seq.map((it, k) => {
+      if (k !== q.hide) return `<div class="tile" style="--i:${k}">${itemHTML(it)}</div>`;
+      if (!a) return `<div class="tile missing" style="--i:${k}" aria-label="kotak kosong">?</div>`;
+      return `<div class="tile ${a.ok ? "filled-ok" : "filled-bad"}" style="--i:${k}">${itemHTML(ans)}</div>`;
+    }).join("");
+
+    const optsHTML = q.opts.map((o, k) => {
+      const kk = key(o);
+      let cls = "";
+      if (a) {
+        if (kk === q.ansKey) cls = "is-ok";
+        else if (kk === a.choice) cls = "is-bad";
+        else cls = "dim";
+      }
+      return `<button type="button" class="opt ${cls}" id="opt-${k}" data-k="${k}" ${a ? "disabled" : ""}><span class="k">${k + 1}</span>${itemHTML(o)}</button>`;
+    }).join("");
+
+    const last = state.i === TOTAL - 1;
+    const fb = a ? `
+      <div class="feedback ${a.ok ? "ok" : "bad"}" role="status">
+        <div>
+          <h3>${a.ok ? pick(["Tepat sekali!", "Hebat, benar!", "Pola ditemukan!"]) : "Belum tepat"}</h3>
+          <p>${q.explain}</p>
+        </div>
+        <button type="button" class="btn" id="next">${last ? "Lihat hasil" : "Soal berikutnya →"}</button>
+      </div>` : "";
+
+    board.innerHTML = `
+      <div class="q-head">
+        <span class="chip">${q.cat}</span>
+        <h2 class="prompt">${q.hide === q.seq.length - 1 ? "Apa yang muncul berikutnya?" : "Apa yang hilang di tengah pola?"}</h2>
+      </div>
+      <div class="seq">${seqHTML}</div>
+      <p class="opts-label">Pilih jawaban:</p>
+      <div class="opts">${optsHTML}</div>
+      ${fb}`;
+
+    if (a) $("next").focus({ preventScroll: true });
+  }
+
+  function renderResult() {
+    const c = state.correct;
+    const stars = c >= 9 ? 3 : c >= 7 ? 2 : c >= 5 ? 1 : 0;
+    const msg = [
+      "Pola memang butuh latihan. Coba lagi dan perhatikan unit yang berulang.",
+      "Lumayan! Kamu sudah mulai melihat keteraturannya.",
+      "Bagus! Sebagian besar pola berhasil kamu pecahkan.",
+      "Luar biasa! Kamu detektif pola sejati.",
+    ][stars];
+    const starSVG = (on) => `<svg viewBox="0 0 100 100" aria-hidden="true"><polygon points="${starPts}" fill="${on ? "var(--marker)" : "var(--line)"}" stroke="${on ? "var(--marker)" : "var(--line)"}" stroke-width="4" stroke-linejoin="round"/></svg>`;
+    const nextLevel = { mudah: "sedang", sedang: "sulit" }[state.level];
+    board.innerHTML = `
+      <div class="result">
+        <span class="chip">Ronde selesai · ${state.level}</span>
+        <div class="big">${c}<small> / ${TOTAL}</small></div>
+        <div class="stars" aria-label="${stars} dari 3 bintang">${[0, 1, 2].map((k) => starSVG(k < stars)).join("")}</div>
+        <p>${msg} Rangkaian benar terpanjang: <b>${state.maxStreak}</b>.</p>
+        <div class="row">
+          <button type="button" class="btn" id="again">Main lagi</button>
+          ${nextLevel && c >= 7 ? `<button type="button" class="btn ghost" id="up">Naik ke tingkat ${nextLevel}</button>` : ""}
+        </div>
+      </div>`;
+    $("again").onclick = () => newRound(state.level);
+    if ($("up")) $("up").onclick = () => newRound(nextLevel);
+  }
+
+  function choose(k) {
+    if (state.done || state.answered) return;
+    const q = state.qs[state.i];
+    const choice = key(q.opts[k]);
+    const ok = choice === q.ansKey;
+    state.answered = { choice, ok };
+    state.results[state.i] = ok;
+    if (ok) {
+      state.correct++;
+      state.streak++;
+      state.maxStreak = Math.max(state.maxStreak, state.streak);
+    } else {
+      state.streak = 0;
+    }
+    render();
+  }
+
+  function next() {
+    if (!state.answered) return;
+    state.answered = null;
+    if (state.i === TOTAL - 1) {
+      state.done = true;
+      const best = store.get();
+      if (best[state.level] == null || state.correct > best[state.level]) {
+        best[state.level] = state.correct;
+        store.set(best);
+      }
+    } else {
+      state.i++;
+    }
+    render();
+  }
+
+  board.addEventListener("click", (e) => {
+    const opt = e.target.closest(".opt");
+    if (opt && !opt.disabled) return choose(Number(opt.dataset.k));
+    if (e.target.closest("#next")) next();
+  });
+  document.querySelector(".levels").addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (b) newRound(b.dataset.level);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (/^[1-4]$/.test(e.key) && !state.answered && !state.done) choose(Number(e.key) - 1);
+    else if (e.key === "Enter" && state.answered && document.activeElement?.id !== "next") next();
+  });
+
+  function start(data) {
+    if (data && data.state && data.state.qs) { state = data.state; render(); }
+    else newRound("mudah");
+  }
+  window.claude?.hot?.snapshot?.(() => ({ state }));
+  window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
