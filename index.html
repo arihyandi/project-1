@@ -117,24 +117,45 @@
     gap: 12px;
   }
   .levels {
-    display: inline-flex;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    padding: 4px;
-    gap: 2px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
   }
   .levels button {
-    font: 600 14px/1 var(--body);
-    color: var(--muted);
-    background: transparent;
-    border: 0;
-    border-radius: 999px;
-    padding: 9px 16px;
+    display: grid;
+    align-content: start;
+    gap: 2px;
+    text-align: left;
+    font-family: var(--body);
+    color: var(--ink);
+    background: var(--card);
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 12px;
     cursor: pointer;
+    transition: border-color 120ms ease;
   }
-  .levels button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
-  .levels button:hover:not([aria-pressed="true"]) { color: var(--ink); }
+  .levels .n {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .levels .t {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1.1;
+  }
+  .levels .c { font-size: 12px; color: var(--muted); }
+  .levels button:hover:not([aria-pressed="true"]) { border-color: var(--accent); }
+  .levels button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .levels button[aria-pressed="true"] .n,
+  .levels button[aria-pressed="true"] .c { color: var(--paper); opacity: 0.75; }
+  .levels .lvl-bar { display: flex; gap: 3px; margin-top: 6px; }
+  .levels .lvl-bar i { width: 10px; height: 4px; border-radius: 2px; background: var(--line); }
+  .levels .lvl-bar i.on { background: var(--marker); }
   .stats { display: flex; gap: 18px; font-size: 13px; color: var(--muted); }
   .stats b {
     display: block;
@@ -145,7 +166,7 @@
     line-height: 1.2;
   }
 
-  .pips { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+  .pips { display: grid; grid-template-columns: repeat(var(--n, 10), 1fr); gap: 4px; }
   .pip { height: 8px; border-radius: 4px; background: var(--line); }
   .pip.ok { background: var(--good); }
   .pip.no { background: var(--bad); }
@@ -205,6 +226,7 @@
     color: var(--ink);
   }
   .tile svg { width: 72%; height: 72%; display: block; }
+  .emo { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-size: 1.15em; line-height: 1; }
   .tile.missing {
     border: 2px dashed var(--accent);
     background: transparent;
@@ -338,6 +360,13 @@
     .feedback { grid-template-columns: 1fr; }
     .feedback .btn { justify-self: start; }
     .stats { gap: 14px; }
+    .levels { gap: 5px; }
+    .levels button { padding: 8px 7px; }
+    .levels .n { font-size: 12px; letter-spacing: 0.04em; }
+    .levels .w { display: none; }
+    .levels .t { font-size: 13.5px; }
+    .levels .c { font-size: 11px; }
+    .levels .lvl-bar i { width: 6px; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -348,17 +377,14 @@
   <header>
     <span class="eyebrow">Berpikir Komputasional · Pengenalan Pola</span>
     <h1>Detektif <span class="hl">Pola</span></h1>
-    <p class="lede">Amati urutannya, temukan aturan yang berulang, lalu pilih yang mengisi kotak bertanda&nbsp;<b>?</b>. Satu ronde berisi 10 soal.</p>
+    <p class="lede">Amati urutannya, temukan aturan yang berulang, lalu pilih yang mengisi kotak bertanda&nbsp;<b>?</b>. Ada 5 tingkat, masing-masing berisi 15–20 soal gambar, angka, dan huruf.</p>
   </header>
 
+  <div class="levels" id="levels" role="group" aria-label="Pilih tingkat"></div>
+
   <div class="toolbar">
-    <div class="levels" role="group" aria-label="Pilih tingkat">
-      <button type="button" id="lv-mudah" data-level="mudah">Mudah</button>
-      <button type="button" id="lv-sedang" data-level="sedang">Sedang</button>
-      <button type="button" id="lv-sulit" data-level="sulit">Sulit</button>
-    </div>
     <div class="stats" aria-live="polite">
-      <div>Soal<b id="st-q">1/10</b></div>
+      <div>Soal<b id="st-q">1/15</b></div>
       <div>Benar<b id="st-ok">0</b></div>
       <div>Beruntun<b id="st-streak">0</b></div>
       <div>Terbaik<b id="st-best">–</b></div>
@@ -379,11 +405,13 @@
       <ul>
         <li>Minta siswa menyebutkan aturannya dengan kata-kata sendiri sebelum menekan jawaban.</li>
         <li>Baca penjelasan setelah setiap soal, lalu diskusikan.</li>
+        <li>Mulai dari Tingkat 1. Naik tingkat setelah mendapat minimal 2 bintang.</li>
         <li>Pintasan: tombol <kbd>1</kbd>–<kbd>4</kbd> memilih jawaban, <kbd>Enter</kbd> lanjut.</li>
       </ul>
     </div>
   </section>
 </div>
+
 
 <script>
 (() => {
@@ -396,8 +424,12 @@
     { id: "ungu", hex: "#8B5CF6" },
   ];
   const SHAPES = ["lingkaran", "persegi", "segitiga", "belah ketupat", "bintang"];
+  const EMO = [
+    { v: "🍎", id: "apel" }, { v: "🍌", id: "pisang" }, { v: "🍇", id: "anggur" }, { v: "🍊", id: "jeruk" },
+    { v: "🐱", id: "kucing" }, { v: "🐟", id: "ikan" }, { v: "🌸", id: "bunga" }, { v: "⚽", id: "bola" },
+  ];
   const DIRS = { 0: "atas", 45: "kanan atas", 90: "kanan", 135: "kanan bawah", 180: "bawah", 225: "kiri bawah", 270: "kiri", 315: "kiri atas" };
-  const TOTAL = 10;
+  const PRIMES = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53];
 
   const starPts = (() => {
     const p = [];
@@ -423,16 +455,27 @@
   const sample = (arr, k) => shuffle(arr).slice(0, k);
   const key = (it) => JSON.stringify(it);
   const hexOf = (id) => COLORS.find((c) => c.id === id).hex;
+  const norm = (a) => ((a % 360) + 360) % 360;
+  const list = (arr) => arr.join(", ");
+  const arrow = (arr) => arr.join(" → ");
 
-  function nameOf(it) {
-    if (it.t === "s") return it.shape + " " + it.color;
-    if (it.t === "a") return "panah ke " + DIRS[it.rot];
-    return String(it.v);
-  }
   const N = (v) => ({ t: "n", v });
   const L = (code) => ({ t: "l", v: String.fromCharCode(code) });
+  const T = (v) => ({ t: "l", v });
+  const D = (v) => ({ t: "d", v });
+  const S = (shape, color, size) => (size ? { t: "s", shape, color, size } : { t: "s", shape, color });
+  const A = (rot, color) => (color ? { t: "a", rot, color } : { t: "a", rot });
+  const E = (e) => ({ t: "e", v: e.v, id: e.id });
 
-  // Build 4 options: answer + first 3 unique distractors from pool.
+  function nameOf(it) {
+    if (it.t === "s") return it.shape + " " + it.color + (it.size ? " " + it.size : "");
+    if (it.t === "a") return "panah ke " + DIRS[it.rot] + (it.color ? " " + it.color : "");
+    if (it.t === "e") return it.id;
+    if (it.t === "d") return it.v + " titik";
+    return String(it.v);
+  }
+
+  // Answer + first 3 unique distractors from pool, shuffled.
   function buildOpts(ans, pool) {
     const seen = new Set([key(ans)]);
     const out = [ans];
@@ -445,140 +488,219 @@
     }
     return shuffle(out);
   }
-  function numPool(ans, d) {
-    const c = [ans + 1, ans - 1, ans + d, ans - d, ans + 2, ans - 2, ans + 10, ans + 2 * d];
-    return shuffle(c.filter((v) => v >= 0 && v !== ans)).map(N);
+  function numPool(ans, d, min = 0) {
+    const c = [ans + 1, ans - 1, ans + d, ans - d, ans + 2, ans - 2, ans + 10, ans + 2 * d, ans + 3];
+    return shuffle(c.filter((v) => v >= min && v !== ans)).map(N);
+  }
+  function letterPool(code, step) {
+    return shuffle([1, -1, 2, -2, 3, -3, 4, -4, step + 1, -step]
+      .map((o) => code + o).filter((c) => c >= 65 && c <= 90 && c !== code)).map(L);
   }
   function make(cat, seq, hide, explain, pool) {
     const ans = seq[hide];
     return { cat, seq, hide, ansKey: key(ans), opts: buildOpts(ans, pool), explain };
   }
-  const list = (arr) => arr.join(", ");
-
-  // ---------- Generators ----------
-  function genWarna() {
-    const tpl = pick(["AB", "AAB", "ABB", "ABC", "AABB"]);
-    const cols = sample(COLORS, 3);
-    const shape = pick(["lingkaran", "persegi", "bintang"]);
-    const unit = [...tpl].map((ch) => ({ t: "s", shape, color: cols[ch.charCodeAt(0) - 65].id }));
-    const len = Math.min(unit.length * 2 + rnd(1, unit.length), 9);
-    const seq = Array.from({ length: len }, (_, i) => unit[i % unit.length]);
-    const ans = seq[len - 1];
-    const pool = shuffle(COLORS.map((c) => ({ t: "s", shape, color: c.id })));
-    return make("Pola Warna", seq, len - 1,
-      `Unit polanya adalah <b>${list(unit.map((u) => u.color))}</b>, lalu diulang terus. Jadi kotak ke-${len} adalah <b>${ans.color}</b>.`, pool);
+  function repeatSeq(unit, maxLen = 9) {
+    const len = Math.min(unit.length * 2 + rnd(1, unit.length), maxLen);
+    return Array.from({ length: len }, (_, i) => unit[i % unit.length]);
   }
+  const fromTpl = (tpl, vals) => [...tpl].map((ch) => vals[ch.charCodeAt(0) - 65]);
 
-  function genBentuk() {
-    const tpl = pick(["AB", "ABC", "AAB", "ABCD"]);
-    const shapes = sample(SHAPES, 4);
+  // ---------- Generators: gambar ----------
+  const genWarna = (tpls) => () => {
+    const cols = sample(COLORS, 4);
+    const shape = pick(["lingkaran", "persegi", "bintang", "segitiga"]);
+    const unit = fromTpl(pick(tpls), cols.map((c) => S(shape, c.id)));
+    const seq = repeatSeq(unit);
+    const ans = seq[seq.length - 1];
+    return make("Pola Warna", seq, seq.length - 1,
+      `Unit polanya adalah <b>${list(unit.map((u) => u.color))}</b>, lalu diulang terus. Jadi kotak ke-${seq.length} adalah <b>${ans.color}</b>.`,
+      shuffle(COLORS.map((c) => S(shape, c.id))));
+  };
+
+  const genBentuk = (tpls) => () => {
     const color = pick(COLORS).id;
-    const unit = [...tpl].map((ch) => ({ t: "s", shape: shapes[ch.charCodeAt(0) - 65], color }));
-    const len = Math.min(unit.length * 2 + rnd(1, unit.length), 9);
-    const seq = Array.from({ length: len }, (_, i) => unit[i % unit.length]);
-    const ans = seq[len - 1];
-    const pool = shuffle(SHAPES.map((s) => ({ t: "s", shape: s, color })));
-    return make("Pola Bentuk", seq, len - 1,
-      `Bentuknya berulang dengan unit <b>${list(unit.map((u) => u.shape))}</b> (${unit.length} bentuk). Kotak ke-${len} adalah <b>${ans.shape}</b>.`, pool);
-  }
+    const unit = fromTpl(pick(tpls), sample(SHAPES, 4).map((s) => S(s, color)));
+    const seq = repeatSeq(unit);
+    const ans = seq[seq.length - 1];
+    return make("Pola Bentuk", seq, seq.length - 1,
+      `Bentuknya berulang dengan unit <b>${list(unit.map((u) => u.shape))}</b> (${unit.length} bentuk). Kotak ke-${seq.length} adalah <b>${ans.shape}</b>.`,
+      shuffle(SHAPES.map((s) => S(s, color))));
+  };
 
-  function genKombinasi(middle) {
-    const sh = sample(SHAPES, 3).slice(0, 2);
-    const co = sample(COLORS, 3).map((c) => c.id);
-    const len = rnd(7, 9);
-    const seq = Array.from({ length: len }, (_, i) => ({ t: "s", shape: sh[i % 2], color: co[i % 3] }));
-    const hide = middle ? rnd(2, len - 2) : len - 1;
-    const ans = seq[hide];
-    const near = shuffle([
-      ...co.filter((c) => c !== ans.color).map((c) => ({ t: "s", shape: ans.shape, color: c })),
-      ...sh.filter((s) => s !== ans.shape).map((s) => ({ t: "s", shape: s, color: ans.color })),
+  const genGambar = (tpls) => () => {
+    const unit = fromTpl(pick(tpls), sample(EMO, 4).map(E));
+    const seq = repeatSeq(unit);
+    const ans = seq[seq.length - 1];
+    return make("Pola Gambar", seq, seq.length - 1,
+      `Gambarnya berulang: <b>${list(unit.map((u) => u.id))}</b>, lalu kembali ke awal. Kotak ke-${seq.length} adalah <b>${ans.id}</b>.`,
+      shuffle(EMO.map(E)));
+  };
+
+  const genUkuran = (tpls) => () => {
+    const shape = pick(SHAPES), color = pick(COLORS).id;
+    const sizes = { B: "besar", K: "kecil" };
+    const unit = [...pick(tpls)].map((ch) => S(shape, color, sizes[ch]));
+    const seq = repeatSeq(unit);
+    const ans = seq[seq.length - 1];
+    const other = ans.size === "besar" ? "kecil" : "besar";
+    const pool = shuffle([
+      S(shape, color, other),
+      ...sample(SHAPES.filter((s) => s !== shape), 2).map((s) => S(s, color, ans.size)),
+      ...sample(COLORS.filter((c) => c.id !== color), 2).map((c) => S(shape, c.id, ans.size)),
     ]);
-    const far = shuffle(COLORS.map((c) => ({ t: "s", shape: pick(SHAPES), color: c.id })));
-    return make("Pola Ganda", seq, hide,
-      `Ada dua pola sekaligus. Bentuk berulang tiap 2 (<b>${list(sh)}</b>) dan warna berulang tiap 3 (<b>${list(co)}</b>). Posisi ke-${hide + 1} jadi <b>${nameOf(ans)}</b>.`,
-      near.concat(far));
-  }
+    return make("Pola Ukuran", seq, seq.length - 1,
+      `Ukurannya berulang: <b>${list(unit.map((u) => u.size))}</b>. Kotak ke-${seq.length} adalah ${shape} <b>${ans.size}</b>.`, pool);
+  };
 
-  function genRotasi() {
-    const step = pick([45, 90, -90, 135]);
-    const start = pick([0, 45, 90, 135, 180, 225, 270, 315]);
+  const genTitik = (steps) => () => {
+    const step = pick(steps), a = rnd(1, 2), len = 5;
+    const seq = Array.from({ length: len }, (_, i) => D(a + step * i));
+    const ans = seq[len - 1].v;
+    const pool = shuffle([ans + 1, ans - 1, ans + step, ans - step, ans + 2].filter((v) => v >= 1 && v !== ans)).map(D);
+    return make("Pola Titik", seq, len - 1,
+      `Jumlah titiknya <b>bertambah ${step}</b> setiap langkah: ${arrow(seq.slice(0, -1).map((x) => x.v))} → <b>${ans}</b> titik.`, pool);
+  };
+
+  const genRotasi = (steps) => () => {
+    const step = pick(steps);
+    const start = pick([0, 45, 90, 135, 180, 225, 270, 315].filter((a) => Math.abs(step) % 90 || a % 90 === 0));
     const len = rnd(5, 6);
-    const norm = (a) => ((a % 360) + 360) % 360;
-    const seq = Array.from({ length: len }, (_, i) => ({ t: "a", rot: norm(start + step * i) }));
+    const seq = Array.from({ length: len }, (_, i) => A(norm(start + step * i)));
     const ans = seq[len - 1];
-    const pool = shuffle([norm(ans.rot + step), norm(ans.rot - step), norm(ans.rot + 180), norm(ans.rot + 45), norm(ans.rot - 45)])
-      .map((r) => ({ t: "a", rot: r }));
+    const pool = shuffle([step, -step, 180, 45, -45, 90].map((o) => A(norm(ans.rot + o))));
     const arah = step > 0 ? "searah jarum jam" : "berlawanan arah jarum jam";
     return make("Pola Putaran", seq, len - 1,
       `Panah berputar <b>${Math.abs(step)}° ${arah}</b> setiap langkah. Jadi panah terakhir menghadap <b>${DIRS[ans.rot]}</b>.`, pool);
-  }
+  };
 
-  function genTambah() {
-    const a = rnd(1, 10), d = rnd(2, 5), len = 5;
+  const genKombinasi = (middle) => () => {
+    const sh = sample(SHAPES, 2);
+    const co = sample(COLORS, 3).map((c) => c.id);
+    const len = rnd(7, 9);
+    const seq = Array.from({ length: len }, (_, i) => S(sh[i % 2], co[i % 3]));
+    const hide = middle ? rnd(2, len - 2) : len - 1;
+    const ans = seq[hide];
+    const near = shuffle([
+      ...co.filter((c) => c !== ans.color).map((c) => S(ans.shape, c)),
+      ...sh.filter((s) => s !== ans.shape).map((s) => S(s, ans.color)),
+    ]);
+    const far = shuffle(COLORS.map((c) => S(pick(SHAPES), c.id)));
+    return make("Pola Ganda", seq, hide,
+      `Ada dua pola sekaligus. Bentuk berulang tiap 2 (<b>${list(sh)}</b>) dan warna berulang tiap 3 (<b>${list(co)}</b>). Posisi ke-${hide + 1} jadi <b>${nameOf(ans)}</b>.`,
+      near.concat(far));
+  };
+
+  const genRotasiWarna = () => {
+    const step = pick([90, -90]);
+    const start = pick([0, 90, 180, 270]);
+    const co = sample(COLORS, 3).map((c) => c.id);
+    const len = rnd(7, 8);
+    const seq = Array.from({ length: len }, (_, i) => A(norm(start + step * i), co[i % 3]));
+    const ans = seq[len - 1];
+    const pool = shuffle([
+      ...co.filter((c) => c !== ans.color).map((c) => A(ans.rot, c)),
+      A(norm(ans.rot + 180), ans.color), A(norm(ans.rot + step), ans.color), A(norm(ans.rot - step), ans.color),
+    ]);
+    const arah = step > 0 ? "searah jarum jam" : "berlawanan arah jarum jam";
+    return make("Putaran + Warna", seq, len - 1,
+      `Panah berputar <b>90° ${arah}</b> setiap langkah, dan warnanya berulang tiap 3 (<b>${list(co)}</b>). Jawabannya <b>${nameOf(ans)}</b>.`, pool);
+  };
+
+  // ---------- Generators: angka ----------
+  const genTambah = (aMin, aMax, dMin, dMax) => () => {
+    const a = rnd(aMin, aMax), d = rnd(dMin, dMax), len = 5;
     const seq = Array.from({ length: len }, (_, i) => N(a + d * i));
     const ans = seq[len - 1].v;
     return make("Pola Bilangan", seq, len - 1,
-      `Setiap angka <b>ditambah ${d}</b>: ${seq.slice(0, -1).map((x) => x.v).join(" → ")} → <b>${ans}</b>.`, numPool(ans, d));
-  }
+      `Setiap angka <b>ditambah ${d}</b>: ${arrow(seq.slice(0, -1).map((x) => x.v))} → <b>${ans}</b>.`, numPool(ans, d));
+  };
 
-  function genKurang() {
-    const d = rnd(3, 7), len = 5, a = rnd(d * len + 2, d * len + 25);
+  const genKurang = (dMin, dMax, extra) => () => {
+    const d = rnd(dMin, dMax), len = 5, a = d * len + rnd(1, extra);
     const seq = Array.from({ length: len }, (_, i) => N(a - d * i));
     const ans = seq[len - 1].v;
     return make("Pola Bilangan", seq, len - 1,
       `Setiap angka <b>dikurangi ${d}</b>. ${seq[len - 2].v} − ${d} = <b>${ans}</b>.`, numPool(ans, d));
-  }
+  };
 
-  function genHuruf() {
-    const step = rnd(1, 3), len = 5;
-    const start = rnd(65, 90 - step * (len - 1));
-    const seq = Array.from({ length: len }, (_, i) => L(start + step * i));
-    const ansCode = start + step * (len - 1);
-    const pool = shuffle([1, -1, 2, -2, 3, -3, -4, step + 1, -step].map((o) => ansCode + o).filter((c) => c >= 65 && c <= 90)).map(L);
-    const lompat = step === 1 ? "maju 1 huruf (berurutan)" : `maju ${step} huruf (melewati ${step - 1} huruf)`;
-    return make("Pola Huruf", seq, len - 1,
-      `Setiap huruf <b>${lompat}</b> di alfabet. Setelah ${seq[len - 2].v} adalah <b>${seq[len - 1].v}</b>.`, pool);
-  }
+  const genTengah = (dMin, dMax) => () => {
+    const a = rnd(2, 20), d = rnd(dMin, dMax), len = 6;
+    const seq = Array.from({ length: len }, (_, i) => N(a + d * i));
+    const hide = rnd(1, len - 2);
+    const ans = seq[hide].v;
+    return make("Bagian yang Hilang", seq, hide,
+      `Setiap angka <b>ditambah ${d}</b>. ${seq[hide - 1].v} + ${d} = <b>${ans}</b>, dan ${ans} + ${d} = ${seq[hide + 1].v}.`, numPool(ans, d));
+  };
 
-  function genBertumbuh() {
+  const genBertumbuh = () => {
     const a = rnd(1, 6), len = 6;
     const seq = [N(a)];
     for (let i = 1; i < len; i++) seq.push(N(seq[i - 1].v + i));
     const ans = seq[len - 1].v;
     return make("Pola Bertumbuh", seq, len - 1,
       `Selisihnya terus bertambah: +1, +2, +3, +4, lalu <b>+${len - 1}</b>. ${seq[len - 2].v} + ${len - 1} = <b>${ans}</b>.`, numPool(ans, len - 2));
-  }
+  };
 
-  function genGeometri() {
+  const genGeometri = () => {
     const r = pick([2, 3]), a = rnd(1, r === 2 ? 5 : 3), len = 5;
     const seq = Array.from({ length: len }, (_, i) => N(a * r ** i));
-    const ans = seq[len - 1].v;
-    const prev = seq[len - 2].v;
-    const pool = shuffle([prev + (prev - seq[len - 3].v), ans + r, ans - r, prev * (r + 1), ans + 1].filter((v) => v !== ans)).map(N).concat(numPool(ans, r));
+    const ans = seq[len - 1].v, prev = seq[len - 2].v;
+    const pool = shuffle([prev + (prev - seq[len - 3].v), ans + r, ans - r, prev * (r + 1)].filter((v) => v !== ans)).map(N)
+      .concat(numPool(ans, r));
     return make("Pola Perkalian", seq, len - 1,
       `Setiap angka <b>dikali ${r}</b>. ${prev} × ${r} = <b>${ans}</b>.`, pool);
-  }
+  };
 
-  function genFibo() {
+  const genFibo = (middle) => () => {
     const a = rnd(1, 3), b = rnd(a, a + 3), len = 7;
     const seq = [N(a), N(b)];
     for (let i = 2; i < len; i++) seq.push(N(seq[i - 1].v + seq[i - 2].v));
-    const ans = seq[len - 1].v, p1 = seq[len - 2].v, p2 = seq[len - 3].v;
-    return make("Pola Penjumlahan", seq, len - 1,
+    const hide = middle ? rnd(3, len - 2) : len - 1;
+    const ans = seq[hide].v, p1 = seq[hide - 1].v, p2 = seq[hide - 2].v;
+    return make(middle ? "Bagian yang Hilang" : "Pola Penjumlahan", seq, hide,
       `Setiap angka adalah <b>jumlah dua angka sebelumnya</b> (mirip deret Fibonacci). ${p2} + ${p1} = <b>${ans}</b>.`,
       numPool(ans, p1 - p2));
-  }
+  };
 
-  function genKuadrat() {
+  const genKuadrat = () => {
     const s = rnd(1, 4), len = 5;
     const seq = Array.from({ length: len }, (_, i) => N((s + i) ** 2));
     const n = s + len - 1, ans = n * n;
     return make("Bilangan Kuadrat", seq, len - 1,
       `Ini bilangan kuadrat: ${s}×${s}, ${s + 1}×${s + 1}, dan seterusnya. Berikutnya <b>${n}×${n} = ${ans}</b>.`,
       numPool(ans, 2 * n - 1));
-  }
+  };
 
-  function genSelang() {
+  const genKubik = () => {
+    const s = rnd(1, 3), len = 5;
+    const seq = Array.from({ length: len }, (_, i) => N((s + i) ** 3));
+    const n = s + len - 1, ans = n ** 3;
+    return make("Bilangan Kubik", seq, len - 1,
+      `Ini bilangan pangkat tiga: ${s}×${s}×${s}, ${s + 1}×${s + 1}×${s + 1}, dan seterusnya. Berikutnya <b>${n}×${n}×${n} = ${ans}</b>.`,
+      shuffle([n * n, ans - n, ans + n, (n - 1) ** 3 + n * n]).filter((v) => v !== ans).map(N).concat(numPool(ans, n)));
+  };
+
+  const genSegitiga = () => {
+    const s = rnd(1, 3), len = 6;
+    const tri = (k) => (k * (k + 1)) / 2;
+    const seq = Array.from({ length: len }, (_, i) => N(tri(s + i)));
+    const ans = seq[len - 1].v, k = s + len - 1;
+    return make("Bilangan Segitiga", seq, len - 1,
+      `Ini bilangan segitiga: selisihnya +${s + 1}, +${s + 2}, +${s + 3}, dan seterusnya. ${seq[len - 2].v} + ${k} = <b>${ans}</b>.`,
+      numPool(ans, k - 1));
+  };
+
+  const genPrima = () => {
+    const i0 = rnd(0, 7), len = 6;
+    const seq = PRIMES.slice(i0, i0 + len).map(N);
+    const ans = seq[len - 1].v;
+    const pool = shuffle([ans + 1, ans - 1, ans + 2, ans - 2, ans + 4, ans + 6].filter((v) => v !== ans && !PRIMES.slice(i0, i0 + len).includes(v))).map(N);
+    return make("Bilangan Prima", seq, len - 1,
+      `Ini deret <b>bilangan prima</b> (hanya habis dibagi 1 dan dirinya sendiri). Bilangan prima setelah ${seq[len - 2].v} adalah <b>${ans}</b>.`, pool);
+  };
+
+  const genSelang = () => {
     const pair = pick([["+", 3, "−", 1], ["+", 5, "−", 2], ["×", 2, "+", 1], ["+", 4, "−", 3]]);
     const op = (v, o, n) => (o === "+" ? v + n : o === "−" ? v - n : v * n);
     const len = 7;
@@ -588,35 +710,146 @@
       seq.push(N(op(seq[i - 1].v, odd ? pair[0] : pair[2], odd ? pair[1] : pair[3])));
     }
     const ans = seq[len - 1].v;
-    const lastOp = (len - 1) % 2 === 1 ? pair[0] + pair[1] : pair[2] + pair[3];
     return make("Pola Selang-seling", seq, len - 1,
-      `Operasinya bergantian: <b>${pair[0]}${pair[1]}</b>, lalu <b>${pair[2]}${pair[3]}</b>, lalu ulang. Langkah terakhir ${lastOp}, jadi <b>${ans}</b>.`,
+      `Operasinya bergantian: <b>${pair[0]}${pair[1]}</b>, lalu <b>${pair[2]}${pair[3]}</b>, lalu ulang. ${seq[len - 2].v} ${pair[2]} ${pair[3]} = <b>${ans}</b>.`,
       numPool(ans, pair[1]));
-  }
-
-  function genTengah() {
-    const a = rnd(3, 20), d = rnd(6, 12), len = 6;
-    const seq = Array.from({ length: len }, (_, i) => N(a + d * i));
-    const hide = rnd(1, len - 2);
-    const ans = seq[hide].v;
-    return make("Bagian yang Hilang", seq, hide,
-      `Setiap angka <b>ditambah ${d}</b>. ${seq[hide - 1].v} + ${d} = <b>${ans}</b>, dan ${ans} + ${d} = ${seq[hide + 1].v}.`, numPool(ans, d));
-  }
-
-  const LEVELS = {
-    mudah: [genWarna, genBentuk, genTambah, genHuruf],
-    sedang: [() => genKombinasi(false), genRotasi, genKurang, genBertumbuh, genHuruf],
-    sulit: [genGeometri, genFibo, genKuadrat, genSelang, genTengah, () => genKombinasi(true)],
   };
 
-  function buildRound(level) {
-    const gens = LEVELS[level];
+  const genSelisihKali = () => {
+    const a = rnd(1, 5), d0 = rnd(1, 2), len = 6;
+    const seq = [N(a)];
+    for (let i = 1; i < len; i++) seq.push(N(seq[i - 1].v + d0 * 2 ** (i - 1)));
+    const ans = seq[len - 1].v, dLast = d0 * 2 ** (len - 2);
+    const diffs = Array.from({ length: len - 1 }, (_, i) => "+" + d0 * 2 ** i);
+    return make("Selisih Berlipat", seq, len - 1,
+      `Selisihnya selalu <b>dua kali lipat</b>: ${list(diffs)}. ${seq[len - 2].v} + ${dLast} = <b>${ans}</b>.`,
+      [N(seq[len - 2].v + dLast / 2)].concat(numPool(ans, dLast / 2)));
+  };
+
+  const genKaliTambah = () => {
+    const [m, c, cs] = pick([[2, 1, "+"], [2, -1, "−"], [3, -1, "−"]]);
+    const a = m === 3 ? rnd(1, 2) : rnd(2, 3), len = m === 3 ? 5 : 6;
+    const seq = [N(a)];
+    for (let i = 1; i < len; i++) seq.push(N(seq[i - 1].v * m + c));
+    const ans = seq[len - 1].v, prev = seq[len - 2].v;
+    return make("Dua Operasi", seq, len - 1,
+      `Setiap angka <b>dikali ${m} lalu ${cs} ${Math.abs(c)}</b>. ${prev} × ${m} ${cs} ${Math.abs(c)} = <b>${ans}</b>.`,
+      [N(prev * m), N(prev * m + 2 * c), N(prev + (prev - seq[len - 3].v))].concat(numPool(ans, 2)));
+  };
+
+  const genDuaDeret = () => {
+    const a0 = rnd(1, 6), k = rnd(2, 4), b0 = rnd(25, 35), m = rnd(1, 3), len = 8;
+    const seq = Array.from({ length: len }, (_, i) => N(i % 2 === 0 ? a0 + k * (i / 2) : b0 - m * ((i - 1) / 2)));
+    const hide = pick([6, 7]);
+    const ans = seq[hide].v;
+    const other = seq[hide === 6 ? 7 : 6].v;
+    const sub = hide === 6 ? `posisi ganjil ditambah ${k}` : `posisi genap dikurangi ${m}`;
+    return make("Dua Deret Diselipkan", seq, hide,
+      `Ada dua deret yang diselipkan bergantian: ${a0}, ${a0 + k}, ${a0 + 2 * k}, … (<b>+${k}</b>) dan ${b0}, ${b0 - m}, ${b0 - 2 * m}, … (<b>−${m}</b>). Untuk ${sub}, jadi <b>${ans}</b>.`,
+      [N(other), N(hide === 6 ? ans - k : ans + m)].concat(numPool(ans, hide === 6 ? k : m)));
+  };
+
+  // ---------- Generators: huruf ----------
+  const genHuruf = (sMin, sMax) => () => {
+    const step = rnd(sMin, sMax), len = 5;
+    const start = rnd(65, 90 - step * (len - 1));
+    const seq = Array.from({ length: len }, (_, i) => L(start + step * i));
+    const lompat = step === 1 ? "maju 1 huruf (berurutan)" : `maju ${step} huruf (melewati ${step - 1} huruf)`;
+    return make("Pola Huruf", seq, len - 1,
+      `Setiap huruf <b>${lompat}</b> di alfabet. Setelah ${seq[len - 2].v} adalah <b>${seq[len - 1].v}</b>.`,
+      letterPool(start + step * (len - 1), step));
+  };
+
+  const genHurufMundur = (sMin, sMax) => () => {
+    const step = rnd(sMin, sMax), len = 5;
+    const start = rnd(65 + step * (len - 1), 90);
+    const seq = Array.from({ length: len }, (_, i) => L(start - step * i));
+    const lompat = step === 1 ? "mundur 1 huruf" : `mundur ${step} huruf`;
+    return make("Huruf Mundur", seq, len - 1,
+      `Hurufnya berjalan dari belakang alfabet, <b>${lompat}</b> setiap langkah. Setelah ${seq[len - 2].v} adalah <b>${seq[len - 1].v}</b>.`,
+      letterPool(start - step * (len - 1), step));
+  };
+
+  const genHurufAngka = () => {
+    const step = pick([1, 2]), len = 5;
+    const c0 = rnd(65, 90 - step * len), n0 = rnd(1, 5);
+    const seq = Array.from({ length: len }, (_, i) => T(String.fromCharCode(c0 + step * i) + (n0 + i)));
+    const c = c0 + step * (len - 1), n = n0 + len - 1;
+    const lt = (cc, nn) => T(String.fromCharCode(cc) + nn);
+    const pool = shuffle([lt(c, n + 1), lt(c + 1, n), lt(c - 1, n), lt(c, n - 1), lt(c + step, n + 1)]);
+    return make("Huruf + Angka", seq, len - 1,
+      `Hurufnya maju <b>${step}</b> langkah dan angkanya bertambah <b>1</b>. Setelah ${seq[len - 2].v} adalah <b>${seq[len - 1].v}</b>.`, pool);
+  };
+
+  const genHurufSelang = () => {
+    const lo = rnd(65, 68), hi = rnd(87, 90), len = 7;
+    const seq = Array.from({ length: len }, (_, i) => L(i % 2 === 0 ? lo + i / 2 : hi - (i - 1) / 2));
+    const ansCode = lo + 3;
+    const pool = shuffle([hi - 3, lo + 4, lo + 2, hi - 2, ansCode + 1].filter((c) => c !== ansCode)).map(L);
+    return make("Huruf Selang-seling", seq, len - 1,
+      `Ada dua barisan huruf bergantian: dari depan <b>${arrow([0, 1, 2].map((i) => String.fromCharCode(lo + i)))}</b> dan dari belakang <b>${arrow([0, 1, 2].map((i) => String.fromCharCode(hi - i)))}</b>. Giliran barisan depan, jadi <b>${String.fromCharCode(ansCode)}</b>.`, pool);
+  };
+
+  const genHurufTumbuh = () => {
+    const start = rnd(65, 69), len = 6;
+    const codes = [start];
+    for (let i = 1; i < len; i++) codes.push(codes[i - 1] + i);
+    const seq = codes.map(L);
+    const ansCode = codes[len - 1];
+    return make("Huruf Bertumbuh", seq, len - 1,
+      `Lompatannya makin jauh: maju 1, 2, 3, 4, lalu <b>maju ${len - 1}</b> huruf. Setelah ${seq[len - 2].v} adalah <b>${seq[len - 1].v}</b>.`,
+      letterPool(ansCode, len - 2));
+  };
+
+  // ---------- Levels ----------
+  const LEVELS = [
+    {
+      name: "Sangat Mudah", count: 15,
+      gens: [genWarna(["AB"]), genBentuk(["AB"]), genGambar(["AB", "AAB"]), genUkuran(["BK"]),
+        genTambah(1, 5, 1, 2), genHuruf(1, 1), genTitik([1])],
+    },
+    {
+      name: "Mudah", count: 16,
+      gens: [genWarna(["AAB", "ABB", "ABC"]), genBentuk(["ABC", "AAB", "ABB"]), genGambar(["ABC", "ABB", "AABB"]),
+        genUkuran(["BBK", "BKK"]), genTambah(1, 10, 2, 5), genKurang(1, 3, 6), genHuruf(1, 2), genTitik([1, 2]), genRotasi([90])],
+    },
+    {
+      name: "Sedang", count: 17,
+      gens: [genKombinasi(false), genRotasi([90, -90, 45]), genKurang(3, 7, 20), genBertumbuh, genHuruf(2, 3),
+        genHurufMundur(1, 2), genTengah(2, 5), genGambar(["ABCD", "AABC"])],
+    },
+    {
+      name: "Sulit", count: 18,
+      gens: [genGeometri, genFibo(false), genKuadrat, genSelang, genTengah(6, 12), genKombinasi(true),
+        genHurufAngka, genHurufSelang, genRotasi([45, 135, -135])],
+    },
+    {
+      name: "Sangat Sulit", count: 20,
+      gens: [genKubik, genSegitiga, genPrima, genSelisihKali, genDuaDeret, genHurufTumbuh, genRotasiWarna,
+        genKaliTambah, genKombinasi(true), genFibo(true)],
+    },
+  ];
+
+  function buildRound(lv) {
+    const { gens, count } = LEVELS[lv];
     let order = [];
-    while (order.length < TOTAL) order = order.concat(shuffle(gens));
-    return order.slice(0, TOTAL).map((g) => g());
+    while (order.length < count) order = order.concat(shuffle(gens));
+    return order.slice(0, count).map((g) => g());
   }
 
   // ---------- Rendering ----------
+  function dotsSVG(n) {
+    const cols = Math.ceil(Math.sqrt(n)), rows = Math.ceil(n / cols);
+    const cell = 84 / Math.max(cols, rows), r = cell * 0.32;
+    const ox = 50 - (cols * cell) / 2, oy = 50 - (rows * cell) / 2;
+    let out = "";
+    for (let i = 0; i < n; i++) {
+      const cx = ox + cell * (i % cols) + cell / 2, cy = oy + cell * Math.floor(i / cols) + cell / 2;
+      out += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" fill="currentColor"/>`;
+    }
+    return `<svg viewBox="0 0 100 100" role="img" aria-label="${n} titik">${out}</svg>`;
+  }
+
   function itemHTML(it) {
     if (it.t === "s") {
       const f = hexOf(it.color);
@@ -628,11 +861,15 @@
         case "belah ketupat": body = `<polygon points="50,6 90,50 50,94 10,50" fill="${f}"/>`; break;
         default: body = `<polygon points="${starPts}" fill="${f}" stroke="${f}" stroke-width="3" stroke-linejoin="round"/>`;
       }
+      if (it.size === "kecil") body = `<g transform="translate(50 50) scale(0.5) translate(-50 -50)">${body}</g>`;
       return `<svg viewBox="0 0 100 100" role="img" aria-label="${nameOf(it)}">${body}</svg>`;
     }
     if (it.t === "a") {
-      return `<svg viewBox="0 0 100 100" role="img" aria-label="${nameOf(it)}"><path d="M50 10 L84 48 H62 V90 H38 V48 H16 Z" fill="currentColor" transform="rotate(${it.rot} 50 50)"/></svg>`;
+      const f = it.color ? hexOf(it.color) : "currentColor";
+      return `<svg viewBox="0 0 100 100" role="img" aria-label="${nameOf(it)}"><path d="M50 10 L84 48 H62 V90 H38 V48 H16 Z" fill="${f}" transform="rotate(${it.rot} 50 50)"/></svg>`;
     }
+    if (it.t === "d") return dotsSVG(it.v);
+    if (it.t === "e") return `<span class="emo" role="img" aria-label="${it.id}">${it.v}</span>`;
     return `<span>${it.v}</span>`;
   }
 
@@ -640,10 +877,21 @@
   const board = $("board");
   let state;
 
+  const STORE_KEY = "detektif-pola-best-v2";
   const store = {
-    get() { try { return JSON.parse(localStorage.getItem("detektif-pola-best") || "{}"); } catch { return {}; } },
-    set(v) { try { localStorage.setItem("detektif-pola-best", JSON.stringify(v)); } catch {} },
+    get() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || "{}"); } catch { return {}; } },
+    set(v) { try { localStorage.setItem(STORE_KEY, JSON.stringify(v)); } catch {} },
   };
+
+  $("levels").innerHTML = LEVELS.map((l, i) => `
+    <button type="button" id="lv-${i + 1}" data-level="${i}">
+      <span class="n"><span class="w">Tingkat </span>${i + 1}</span>
+      <span class="t">${l.name}</span>
+      <span class="c">${l.count} soal</span>
+      <span class="lvl-bar" aria-hidden="true">${[0, 1, 2, 3, 4].map((k) => `<i class="${k <= i ? "on" : ""}"></i>`).join("")}</span>
+    </button>`).join("");
+
+  const total = () => LEVELS[state.level].count;
 
   function newRound(level) {
     state = { level, qs: buildRound(level), i: 0, correct: 0, streak: 0, maxStreak: 0, results: [], answered: null, done: false };
@@ -651,14 +899,17 @@
   }
 
   function renderStats() {
-    document.querySelectorAll(".levels button").forEach((b) =>
-      b.setAttribute("aria-pressed", String(b.dataset.level === state.level)));
-    $("st-q").textContent = `${Math.min(state.i + 1, TOTAL)}/${TOTAL}`;
+    const n = total();
+    document.querySelectorAll("#levels button").forEach((b) =>
+      b.setAttribute("aria-pressed", String(Number(b.dataset.level) === state.level)));
+    $("st-q").textContent = `${Math.min(state.i + 1, n)}/${n}`;
     $("st-ok").textContent = state.correct;
     $("st-streak").textContent = state.streak;
     const best = store.get()[state.level];
-    $("st-best").textContent = best == null ? "–" : `${best}/${TOTAL}`;
-    $("pips").innerHTML = Array.from({ length: TOTAL }, (_, k) => {
+    $("st-best").textContent = best == null ? "–" : `${best}/${n}`;
+    const pips = $("pips");
+    pips.style.setProperty("--n", n);
+    pips.innerHTML = Array.from({ length: n }, (_, k) => {
       const r = state.results[k];
       const cls = r === true ? "ok" : r === false ? "no" : k === state.i && !state.done ? "now" : "";
       return `<div class="pip ${cls}"></div>`;
@@ -689,7 +940,7 @@
       return `<button type="button" class="opt ${cls}" id="opt-${k}" data-k="${k}" ${a ? "disabled" : ""}><span class="k">${k + 1}</span>${itemHTML(o)}</button>`;
     }).join("");
 
-    const last = state.i === TOTAL - 1;
+    const last = state.i === total() - 1;
     const fb = a ? `
       <div class="feedback ${a.ok ? "ok" : "bad"}" role="status">
         <div>
@@ -713,8 +964,8 @@
   }
 
   function renderResult() {
-    const c = state.correct;
-    const stars = c >= 9 ? 3 : c >= 7 ? 2 : c >= 5 ? 1 : 0;
+    const c = state.correct, n = total(), pct = c / n;
+    const stars = pct >= 0.9 ? 3 : pct >= 0.75 ? 2 : pct >= 0.55 ? 1 : 0;
     const msg = [
       "Pola memang butuh latihan. Coba lagi dan perhatikan unit yang berulang.",
       "Lumayan! Kamu sudah mulai melihat keteraturannya.",
@@ -722,20 +973,20 @@
       "Luar biasa! Kamu detektif pola sejati.",
     ][stars];
     const starSVG = (on) => `<svg viewBox="0 0 100 100" aria-hidden="true"><polygon points="${starPts}" fill="${on ? "var(--marker)" : "var(--line)"}" stroke="${on ? "var(--marker)" : "var(--line)"}" stroke-width="4" stroke-linejoin="round"/></svg>`;
-    const nextLevel = { mudah: "sedang", sedang: "sulit" }[state.level];
+    const next = state.level + 1 < LEVELS.length ? state.level + 1 : null;
     board.innerHTML = `
       <div class="result">
-        <span class="chip">Ronde selesai · ${state.level}</span>
-        <div class="big">${c}<small> / ${TOTAL}</small></div>
+        <span class="chip">Tingkat ${state.level + 1} · ${LEVELS[state.level].name} selesai</span>
+        <div class="big">${c}<small> / ${n}</small></div>
         <div class="stars" aria-label="${stars} dari 3 bintang">${[0, 1, 2].map((k) => starSVG(k < stars)).join("")}</div>
         <p>${msg} Rangkaian benar terpanjang: <b>${state.maxStreak}</b>.</p>
         <div class="row">
           <button type="button" class="btn" id="again">Main lagi</button>
-          ${nextLevel && c >= 7 ? `<button type="button" class="btn ghost" id="up">Naik ke tingkat ${nextLevel}</button>` : ""}
+          ${next !== null && stars >= 2 ? `<button type="button" class="btn ghost" id="up">Naik ke Tingkat ${next + 1} (${LEVELS[next].name})</button>` : ""}
         </div>
       </div>`;
     $("again").onclick = () => newRound(state.level);
-    if ($("up")) $("up").onclick = () => newRound(nextLevel);
+    if ($("up")) $("up").onclick = () => newRound(next);
   }
 
   function choose(k) {
@@ -758,7 +1009,7 @@
   function next() {
     if (!state.answered) return;
     state.answered = null;
-    if (state.i === TOTAL - 1) {
+    if (state.i === total() - 1) {
       state.done = true;
       const best = store.get();
       if (best[state.level] == null || state.correct > best[state.level]) {
@@ -776,9 +1027,9 @@
     if (opt && !opt.disabled) return choose(Number(opt.dataset.k));
     if (e.target.closest("#next")) next();
   });
-  document.querySelector(".levels").addEventListener("click", (e) => {
+  $("levels").addEventListener("click", (e) => {
     const b = e.target.closest("button");
-    if (b) newRound(b.dataset.level);
+    if (b) newRound(Number(b.dataset.level));
   });
   document.addEventListener("keydown", (e) => {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -787,8 +1038,11 @@
   });
 
   function start(data) {
-    if (data && data.state && data.state.qs) { state = data.state; render(); }
-    else newRound("mudah");
+    const s = data && data.state;
+    if (s && Number.isInteger(s.level) && LEVELS[s.level] && Array.isArray(s.qs) && s.qs.length === LEVELS[s.level].count) {
+      state = s;
+      render();
+    } else newRound(0);
   }
   window.claude?.hot?.snapshot?.(() => ({ state }));
   window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
