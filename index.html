@@ -140,13 +140,22 @@
     position: absolute;
     z-index: -1;
     left: -0.08em;
-    right: -0.1em;
+    right: -0.08em;
     bottom: 0.1em;
-    height: 0.34em;
+    height: 0.32em;
     background: var(--marker);
-    border-radius: 0.12em;
-    transform: rotate(-1.5deg);
+    border-radius: 0.16em;
   }
+  .title-row { display: flex; align-items: center; gap: clamp(12px, 3vw, 22px); }
+  .detective { flex: none; width: clamp(64px, 14vw, 96px); height: auto; display: block; }
+  .det-coat { fill: var(--ink); }
+  .det-collar { fill: var(--card); }
+  .det-hat { fill: var(--accent); }
+  .det-band { fill: var(--marker); }
+  .det-skin { fill: #F2C29B; }
+  .det-face { fill: #17233A; }
+  .det-lens { fill: var(--card); stroke: var(--marker); }
+  .det-handle { stroke: var(--ink); }
   .lede { margin: 0; color: var(--muted); max-width: 60ch; }
 
   /* Toolbar */
@@ -510,6 +519,8 @@
     .levels .lvl-bar i { width: 6px; }
     .eyebrow { flex-direction: column; align-items: flex-start; gap: 2px; }
     .eyebrow span + span::before { display: none; }
+    .detective { width: 58px; }
+    h1 { font-size: 36px; }
     .round summary { grid-template-columns: 1fr auto; }
     .r-date { grid-column: 1 / -1; }
     .hist-tools { align-items: stretch; }
@@ -524,7 +535,26 @@
 <div class="wrap">
   <header>
     <span class="eyebrow"><span>Berpikir Komputasional</span><span>Pengenalan Pola</span></span>
-    <h1>Detektif <span class="hl">Pola</span></h1>
+    <div class="title-row">
+      <svg class="detective" viewBox="14 22 98 98" role="img" aria-label="Gambar detektif dengan kaca pembesar">
+        <path class="det-coat" d="M18 120 C18 94 36 84 56 84 C76 84 94 94 94 120 Z"/>
+        <path class="det-collar" d="M46 85 L56 100 L66 85 Z"/>
+        <circle class="det-skin" cx="56" cy="62" r="19"/>
+        <circle class="det-face" cx="49" cy="62" r="2.6"/>
+        <circle class="det-face" cx="63" cy="62" r="2.6"/>
+        <path d="M50 71 Q56 75 62 71" fill="none" stroke="#17233A" stroke-width="2.4" stroke-linecap="round"/>
+        <path class="det-hat" d="M34 48 C34 26 78 26 78 48 Z"/>
+        <rect class="det-band" x="34" y="42" width="44" height="6" rx="1.5"/>
+        <ellipse class="det-hat" cx="56" cy="49" rx="30" ry="5.5"/>
+        <line class="det-handle" x1="80" y1="88" x2="70" y2="100" stroke-width="7" stroke-linecap="round"/>
+        <circle class="det-skin" cx="72" cy="98" r="6"/>
+        <circle class="det-lens" cx="92" cy="74" r="15" stroke-width="5"/>
+        <circle cx="86" cy="70" r="4" fill="#E5484D"/>
+        <rect x="91" y="74" width="7" height="7" rx="1" fill="#2F6BFF"/>
+        <circle cx="96" cy="67" r="2.5" fill="#1FA36B"/>
+      </svg>
+      <h1>Detektif <span class="hl">Pola</span></h1>
+    </div>
     <p class="lede">Amati urutannya, temukan aturan yang berulang, lalu pilih yang mengisi kotak bertanda&nbsp;<b>?</b>. Ada 5 tingkat, masing-masing berisi 15–20 soal gambar, angka, dan huruf.</p>
     <div class="userbar" id="userbar" hidden>
       <span class="who" id="who"></span>
