@@ -74,6 +74,7 @@
   }
 
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body {
     margin: 0;
     background-color: var(--paper);
@@ -337,6 +338,106 @@
   .result p { margin: 0; max-width: 60ch; }
   .result .row { display: flex; flex-wrap: wrap; gap: 10px; }
 
+  /* Login, user bar */
+  .userbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+  .who { font-size: 14px; color: var(--muted); }
+  .who b { color: var(--ink); }
+  .userbar-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .btn.sm { padding: 9px 14px; font-size: 14px; }
+  .btn.danger { background: var(--bad); color: var(--card); }
+  .btn.ghost.danger { background: transparent; color: var(--bad); border-color: var(--bad); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .game { display: grid; gap: 20px; }
+  .login { max-width: 520px; width: 100%; }
+  .muted { margin: 0; color: var(--muted); }
+  .login-form { display: grid; gap: 14px; }
+  .field { display: grid; gap: 6px; }
+  .field label { font-size: 14px; font-weight: 600; }
+  .field input, .field select {
+    font: 400 16px/1.3 var(--body);
+    color: var(--ink);
+    background: var(--tile);
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    width: 100%;
+  }
+  .field input:focus-visible, .field select:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+  .field input[aria-invalid="true"] { border-color: var(--bad); }
+  .form-error { margin: 0; color: var(--bad); font-size: 14px; font-weight: 500; }
+  .login-form .btn { justify-self: start; }
+
+  /* History */
+  .hist-summary { margin: 0; color: var(--muted); font-size: 14px; }
+  .hist-tools { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 12px; }
+  .field.inline { display: flex; align-items: center; gap: 8px; }
+  .field.inline select { width: auto; padding: 8px 10px; font-size: 14px; }
+  .hist-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .confirm { display: grid; gap: 10px; background: var(--bad-bg); border-radius: 12px; padding: 14px 16px; }
+  .confirm p { margin: 0; }
+  .confirm .row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .hist-list { display: grid; gap: 10px; }
+  .round { background: var(--tile); border: 1.5px solid var(--line); border-radius: 12px; }
+  .round summary {
+    list-style: none;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 1.2fr 1.3fr 1.2fr 1fr auto;
+    gap: 6px 14px;
+    align-items: center;
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+  .round summary::-webkit-details-marker { display: none; }
+  .round summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+  .round[open] summary { border-bottom: 1.5px solid var(--line); }
+  .r-date { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .r-who, .r-level { min-width: 0; overflow-wrap: anywhere; }
+  .r-score b { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .pill { justify-self: start; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .pill.ok, .pill.done { background: var(--good-bg); color: var(--good); }
+  .pill.no { background: var(--bad-bg); color: var(--bad); }
+  .pill.open { background: var(--line); color: var(--muted); }
+  .ans-list { list-style: none; margin: 0; padding: 4px 14px 10px; }
+  .ans { display: grid; grid-template-columns: 26px 1fr auto; gap: 12px; align-items: start; padding: 10px 0; border-bottom: 1px dashed var(--line); }
+  .ans:last-child { border-bottom: 0; }
+  .ans-no { font-family: var(--mono); font-size: 13px; color: var(--muted); padding-top: 2px; }
+  .ans-body { display: grid; gap: 6px; min-width: 0; }
+  .ans-cat { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .mini-seq { display: flex; flex-wrap: wrap; gap: 4px; }
+  .mini {
+    min-width: 30px;
+    height: 30px;
+    padding-inline: 4px;
+    display: inline-grid;
+    place-items: center;
+    vertical-align: middle;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .mini svg { width: 22px; height: 22px; display: block; }
+  .mini.q { border: 1.5px dashed var(--accent); color: var(--accent); }
+  .ans-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; font-size: 13px; color: var(--muted); }
+  .ans-pick > span { display: inline-flex; align-items: center; gap: 6px; }
+  .empty { margin: 0; padding: 18px; text-align: center; color: var(--muted); font-size: 14px; border: 1.5px dashed var(--line); border-radius: 12px; }
+
   /* Teacher note */
   .note {
     display: grid;
@@ -378,6 +479,9 @@
     .levels .t { font-size: 13.5px; }
     .levels .c { font-size: 11px; }
     .levels .lvl-bar i { width: 6px; }
+    .round summary { grid-template-columns: 1fr auto; }
+    .r-date { grid-column: 1 / -1; }
+    .hist-tools { align-items: stretch; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -391,8 +495,72 @@
     <span class="eyebrow">Berpikir Komputasional · Pengenalan Pola</span>
     <h1>Detektif <span class="hl">Pola</span></h1>
     <p class="lede">Amati urutannya, temukan aturan yang berulang, lalu pilih yang mengisi kotak bertanda&nbsp;<b>?</b>. Ada 5 tingkat, masing-masing berisi 15–20 soal gambar, angka, dan huruf.</p>
+    <div class="userbar" id="userbar" hidden>
+      <span class="who" id="who"></span>
+      <div class="userbar-actions">
+        <button type="button" class="btn ghost sm" id="btn-main" hidden>Kembali bermain</button>
+        <button type="button" class="btn ghost sm" id="btn-riwayat">Riwayat</button>
+        <button type="button" class="btn ghost sm" id="btn-keluar">Keluar</button>
+      </div>
+    </div>
   </header>
 
+  <section class="board login" id="view-login" aria-labelledby="login-title">
+    <div class="q-head">
+      <span class="chip">Masuk</span>
+      <h2 class="prompt" id="login-title">Tulis nama dan kelasmu dulu</h2>
+      <p class="muted">Nama dan kelas dipakai untuk mencatat riwayat jawabanmu.</p>
+    </div>
+    <form id="login-form" class="login-form" novalidate>
+      <div class="field">
+        <label for="in-nama">Nama lengkap</label>
+        <input id="in-nama" name="nama" type="text" autocomplete="off" maxlength="40" placeholder="contoh: Siti Aminah">
+      </div>
+      <div class="field">
+        <label for="in-kelas">Kelas</label>
+        <input id="in-kelas" name="kelas" type="text" autocomplete="off" maxlength="12" placeholder="contoh: 7A">
+      </div>
+      <p class="form-error" id="login-error" role="alert" hidden></p>
+      <button type="submit" class="btn" id="btn-masuk">Masuk dan mulai</button>
+    </form>
+  </section>
+
+  <section class="board history" id="view-riwayat" aria-labelledby="hist-title" hidden>
+    <div class="q-head">
+      <span class="chip">Riwayat</span>
+      <h2 class="prompt" id="hist-title">Riwayat Jawaban</h2>
+      <p class="hist-summary" id="hist-summary"></p>
+    </div>
+    <div class="hist-tools">
+      <div class="filters">
+        <div class="field inline">
+          <label for="f-siapa">Tampilkan</label>
+          <select id="f-siapa">
+            <option value="saya">Hanya saya</option>
+            <option value="semua">Semua siswa di perangkat ini</option>
+          </select>
+        </div>
+        <div class="field inline">
+          <label for="f-kelas">Kelas</label>
+          <select id="f-kelas"></select>
+        </div>
+      </div>
+      <div class="hist-actions">
+        <button type="button" class="btn ghost sm" id="btn-csv">Unduh CSV</button>
+        <button type="button" class="btn ghost sm danger" id="btn-hapus">Hapus riwayat</button>
+      </div>
+    </div>
+    <div class="confirm" id="hapus-confirm" role="alert" hidden>
+      <p id="hapus-text"></p>
+      <div class="row">
+        <button type="button" class="btn danger sm" id="btn-hapus-ya">Ya, hapus</button>
+        <button type="button" class="btn ghost sm" id="btn-hapus-batal">Batal</button>
+      </div>
+    </div>
+    <div class="hist-list" id="hist-list"></div>
+  </section>
+
+  <div class="game" id="view-game" hidden>
   <div class="levels" id="levels" role="group" aria-label="Pilih tingkat"></div>
 
   <div class="toolbar">
@@ -407,6 +575,7 @@
   <div class="pips" id="pips" aria-hidden="true"></div>
 
   <main class="board" id="board"></main>
+  </div>
 
   <section class="note">
     <div>
@@ -419,6 +588,7 @@
         <li>Minta siswa menyebutkan aturannya dengan kata-kata sendiri sebelum menekan jawaban.</li>
         <li>Baca penjelasan setelah setiap soal, lalu diskusikan.</li>
         <li>Mulai dari Tingkat 1. Naik tingkat setelah mendapat minimal 2 bintang.</li>
+        <li>Buka <b>Riwayat → Semua siswa</b> untuk melihat jawaban seluruh siswa yang bermain di perangkat ini, lalu unduh sebagai CSV.</li>
         <li>Pintasan: tombol <kbd>1</kbd>–<kbd>4</kbd> memilih jawaban, <kbd>Enter</kbd> lanjut.</li>
       </ul>
     </div>
@@ -426,6 +596,7 @@
 </div>
 
 
+<script src="config.js"></script>
 <script>
 (() => {
   // ---------- Data ----------
@@ -888,13 +1059,81 @@
 
   const $ = (id) => document.getElementById(id);
   const board = $("board");
-  let state;
+  const CONFIG = window.DETEKTIF_POLA_CONFIG || {};
+  const SHEETS_URL = String(CONFIG.googleSheetsUrl || "").trim();
+  let state = null;
+  let user = null;
+  let view = "login";
+  let histRows = [];
 
-  const STORE_KEY = "detektif-pola-best-v2";
-  const store = {
-    get() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || "{}"); } catch { return {}; } },
-    set(v) { try { localStorage.setItem(STORE_KEY, JSON.stringify(v)); } catch {} },
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  // ---------- Penyimpanan (localStorage) ----------
+  const ls = {
+    get(k, fb) { try { const v = localStorage.getItem(k); return v == null ? fb : JSON.parse(v); } catch { return fb; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+    del(k) { try { localStorage.removeItem(k); } catch {} },
   };
+  const K_USER = "detektif-pola-user";
+  const K_KELAS = "detektif-pola-kelas-terakhir";
+  const K_HIST = "detektif-pola-riwayat";
+  const K_BEST = "detektif-pola-best-v3";
+  const MAX_ROUNDS = 300;
+  const userKey = (u) => (u.nama + "|" + u.kelas).toLowerCase();
+
+  const loadHist = () => {
+    const h = ls.get(K_HIST, []);
+    return Array.isArray(h) ? h : [];
+  };
+  function saveRound(rec) {
+    const h = loadHist();
+    const i = h.findIndex((r) => r.id === rec.id);
+    if (i >= 0) h[i] = rec;
+    else h.push(rec);
+    ls.set(K_HIST, h.slice(-MAX_ROUNDS));
+  }
+
+  const total = () => LEVELS[state.level].count;
+  const levelLabel = (lv) => `Tingkat ${lv + 1} (${LEVELS[lv].name})`;
+  const soalText = (a) => a.seq.map((it, k) => (k === a.hide ? "?" : nameOf(it))).join(", ");
+  const starsOf = (c, n) => (c / n >= 0.9 ? 3 : c / n >= 0.75 ? 2 : c / n >= 0.55 ? 1 : 0);
+  const nilaiOf = (c, n) => Math.round((c / n) * 100);
+  const fmtTime = (ts) => new Date(ts).toLocaleString("id-ID", {
+    day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
+  });
+
+  // ---------- Google Sheets (opsional) ----------
+  function send(payload) {
+    if (!SHEETS_URL) return;
+    try {
+      fetch(SHEETS_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload),
+      }).catch(() => {});
+    } catch {}
+  }
+
+  // ---------- Tampilan ----------
+  function show(next) {
+    view = next;
+    $("view-login").hidden = view !== "login";
+    $("view-game").hidden = view !== "game";
+    $("view-riwayat").hidden = view !== "riwayat";
+    $("userbar").hidden = view === "login";
+    $("btn-main").hidden = view !== "riwayat";
+    $("btn-riwayat").hidden = view === "riwayat";
+    if (view === "riwayat") renderHistory();
+    if (view === "login") $("in-nama").focus({ preventScroll: true });
+  }
+
+  function enterGame(resume) {
+    $("who").innerHTML = `Masuk sebagai <b>${esc(user.nama)}</b> · Kelas ${esc(user.kelas)}`;
+    show("game");
+    if (resume) render();
+    else newRound(0);
+  }
 
   $("levels").innerHTML = LEVELS.map((l, i) => `
     <button type="button" id="lv-${i + 1}" data-level="${i}">
@@ -904,10 +1143,15 @@
       <span class="lvl-bar" aria-hidden="true">${[0, 1, 2, 3, 4].map((k) => `<i class="${k <= i ? "on" : ""}"></i>`).join("")}</span>
     </button>`).join("");
 
-  const total = () => LEVELS[state.level].count;
-
   function newRound(level) {
-    state = { level, qs: buildRound(level), i: 0, correct: 0, streak: 0, maxStreak: 0, results: [], answered: null, done: false };
+    state = {
+      level, qs: buildRound(level), i: 0, correct: 0, streak: 0, maxStreak: 0, results: [], answered: null, done: false,
+      rec: {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        nama: user.nama, kelas: user.kelas, level,
+        mulai: Date.now(), selesai: null, benar: 0, total: LEVELS[level].count, answers: [],
+      },
+    };
     render();
   }
 
@@ -918,7 +1162,7 @@
     $("st-q").textContent = `${Math.min(state.i + 1, n)}/${n}`;
     $("st-ok").textContent = state.correct;
     $("st-streak").textContent = state.streak;
-    const best = store.get()[state.level];
+    const best = (ls.get(K_BEST, {})[userKey(user)] || {})[state.level];
     $("st-best").textContent = best == null ? "–" : `${best}/${n}`;
     const pips = $("pips");
     pips.style.setProperty("--n", n);
@@ -977,8 +1221,8 @@
   }
 
   function renderResult() {
-    const c = state.correct, n = total(), pct = c / n;
-    const stars = pct >= 0.9 ? 3 : pct >= 0.75 ? 2 : pct >= 0.55 ? 1 : 0;
+    const c = state.correct, n = total();
+    const stars = starsOf(c, n);
     const msg = [
       "Pola memang butuh latihan. Coba lagi dan perhatikan unit yang berulang.",
       "Lumayan! Kamu sudah mulai melihat keteraturannya.",
@@ -992,14 +1236,16 @@
         <span class="chip">Tingkat ${state.level + 1} · ${LEVELS[state.level].name} selesai</span>
         <div class="big">${c}<small> / ${n}</small></div>
         <div class="stars" aria-label="${stars} dari 3 bintang">${[0, 1, 2].map((k) => starSVG(k < stars)).join("")}</div>
-        <p>${msg} Rangkaian benar terpanjang: <b>${state.maxStreak}</b>.</p>
+        <p>${msg} Nilai: <b>${nilaiOf(c, n)}</b>. Rangkaian benar terpanjang: <b>${state.maxStreak}</b>. Hasil ini sudah tersimpan di riwayat.</p>
         <div class="row">
           <button type="button" class="btn" id="again">Main lagi</button>
           ${next !== null && stars >= 2 ? `<button type="button" class="btn ghost" id="up">Naik ke Tingkat ${next + 1} (${LEVELS[next].name})</button>` : ""}
+          <button type="button" class="btn ghost" id="to-hist">Lihat riwayat</button>
         </div>
       </div>`;
     $("again").onclick = () => newRound(state.level);
     if ($("up")) $("up").onclick = () => newRound(next);
+    $("to-hist").onclick = () => show("riwayat");
   }
 
   function choose(k) {
@@ -1016,6 +1262,17 @@
     } else {
       state.streak = 0;
     }
+
+    const rec = state.rec;
+    const entry = { t: Date.now(), cat: q.cat, seq: q.seq, hide: q.hide, pick: q.opts[k], ok };
+    rec.answers.push(entry);
+    rec.benar = state.correct;
+    saveRound(rec);
+    send({
+      type: "jawaban", waktu: fmtTime(entry.t), nama: rec.nama, kelas: rec.kelas, tingkat: levelLabel(rec.level),
+      ronde: rec.id, no: rec.answers.length, jenis: q.cat, soal: soalText(entry),
+      jawaban: nameOf(entry.pick), kunci: nameOf(q.seq[q.hide]), hasil: ok ? "Benar" : "Salah",
+    });
     render();
   }
 
@@ -1024,16 +1281,165 @@
     state.answered = null;
     if (state.i === total() - 1) {
       state.done = true;
-      const best = store.get();
-      if (best[state.level] == null || state.correct > best[state.level]) {
-        best[state.level] = state.correct;
-        store.set(best);
+      const rec = state.rec;
+      rec.selesai = Date.now();
+      saveRound(rec);
+      send({
+        type: "ringkasan", mulai: fmtTime(rec.mulai), selesai: fmtTime(rec.selesai), nama: rec.nama, kelas: rec.kelas,
+        tingkat: levelLabel(rec.level), benar: rec.benar, total: rec.total, nilai: nilaiOf(rec.benar, rec.total),
+        bintang: starsOf(rec.benar, rec.total), ronde: rec.id,
+      });
+      const best = ls.get(K_BEST, {});
+      const mine = best[userKey(user)] || {};
+      if (mine[state.level] == null || state.correct > mine[state.level]) {
+        mine[state.level] = state.correct;
+        best[userKey(user)] = mine;
+        ls.set(K_BEST, best);
       }
     } else {
       state.i++;
     }
     render();
   }
+
+  // ---------- Riwayat ----------
+  function renderHistory() {
+    const all = loadHist().slice().reverse();
+    const siapa = $("f-siapa").value;
+    const fk = $("f-kelas");
+    const kelasList = [...new Set(all.map((r) => r.kelas))].sort();
+    const prev = fk.value;
+    fk.innerHTML = `<option value="">Semua kelas</option>` + kelasList.map((k) => `<option value="${esc(k)}">${esc(k)}</option>`).join("");
+    fk.value = kelasList.includes(prev) ? prev : "";
+    fk.disabled = siapa === "saya";
+
+    histRows = siapa === "saya"
+      ? all.filter((r) => userKey(r) === userKey(user))
+      : all.filter((r) => !fk.value || r.kelas === fk.value);
+
+    $("hapus-confirm").hidden = true;
+    $("btn-csv").disabled = histRows.length === 0;
+    $("btn-hapus").disabled = histRows.length === 0;
+
+    const done = histRows.filter((r) => r.selesai);
+    const nAns = histRows.reduce((s, r) => s + r.answers.length, 0);
+    const avg = done.length ? Math.round(done.reduce((s, r) => s + nilaiOf(r.benar, r.total), 0) / done.length) : null;
+    const where = SHEETS_URL ? "Riwayat juga dikirim ke Google Sheets guru." : "Riwayat tersimpan di perangkat ini.";
+    $("hist-summary").textContent = histRows.length
+      ? `${histRows.length} ronde · ${nAns} jawaban${avg == null ? "" : ` · rata-rata nilai ${avg}`}. ${where}`
+      : where;
+
+    const shown = histRows.slice(0, 100);
+    $("hist-list").innerHTML = shown.length
+      ? shown.map(roundHTML).join("") + (histRows.length > 100 ? `<p class="empty">Menampilkan 100 ronde terbaru. Unduh CSV untuk melihat semuanya.</p>` : "")
+      : `<p class="empty">${siapa === "saya" ? "Belum ada riwayat. Jawab soal pertama untuk mulai mencatat." : "Belum ada riwayat di perangkat ini."}</p>`;
+  }
+
+  function roundHTML(r) {
+    const n = r.answers.length;
+    const score = r.selesai
+      ? `<b>${r.benar}/${r.total}</b> · nilai ${nilaiOf(r.benar, r.total)}`
+      : `<b>${r.benar}/${n}</b> dijawab`;
+    return `
+      <details class="round" data-id="${esc(r.id)}">
+        <summary>
+          <span class="r-date">${fmtTime(r.mulai)}</span>
+          <span class="r-who"><b>${esc(r.nama)}</b> · ${esc(r.kelas)}</span>
+          <span class="r-level">${levelLabel(r.level)}</span>
+          <span class="r-score">${score}</span>
+          <span class="pill ${r.selesai ? "done" : "open"}">${r.selesai ? "Selesai" : "Belum selesai"}</span>
+        </summary>
+        <ol class="ans-list"></ol>
+      </details>`;
+  }
+
+  function ansHTML(a, i) {
+    const mini = (it) => `<span class="mini">${itemHTML(it)}</span>`;
+    const label = (it) => (it.t === "n" || it.t === "l" ? "" : " " + esc(nameOf(it)));
+    const seq = a.seq.map((it, k) => (k === a.hide ? `<span class="mini q">?</span>` : mini(it))).join("");
+    return `
+      <li class="ans">
+        <span class="ans-no">${i + 1}</span>
+        <div class="ans-body">
+          <span class="ans-cat">${esc(a.cat)}</span>
+          <div class="mini-seq">${seq}</div>
+          <div class="ans-pick">
+            <span>Jawaban: ${mini(a.pick)}${label(a.pick)}</span>
+            ${a.ok ? "" : `<span>Kunci: ${mini(a.seq[a.hide])}${label(a.seq[a.hide])}</span>`}
+          </div>
+        </div>
+        <span class="pill ${a.ok ? "ok" : "no"}">${a.ok ? "Benar" : "Salah"}</span>
+      </li>`;
+  }
+
+  $("hist-list").addEventListener("toggle", (e) => {
+    const d = e.target;
+    if (!d.open || d.dataset.filled) return;
+    const r = histRows.find((x) => x.id === d.dataset.id);
+    if (!r) return;
+    d.querySelector(".ans-list").innerHTML = r.answers.map(ansHTML).join("");
+    d.dataset.filled = "1";
+  }, true);
+
+  function downloadCSV() {
+    const rows = [["Waktu", "Nama", "Kelas", "Tingkat", "Ronde", "No", "Jenis Pola", "Soal", "Jawaban Siswa", "Kunci", "Hasil"]];
+    histRows.slice().reverse().forEach((r) => r.answers.forEach((a, i) => rows.push([
+      fmtTime(a.t), r.nama, r.kelas, levelLabel(r.level), r.id, i + 1, a.cat, soalText(a),
+      nameOf(a.pick), nameOf(a.seq[a.hide]), a.ok ? "Benar" : "Salah",
+    ])));
+    const csv = "﻿" + rows.map((row) => row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(";")).join("\r\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `riwayat-detektif-pola-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  // ---------- Event ----------
+  $("login-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const nama = $("in-nama").value.replace(/\s+/g, " ").trim();
+    const kelas = $("in-kelas").value.replace(/\s+/g, " ").trim().toUpperCase();
+    let err = "", field = null;
+    if (nama.length < 2) { err = nama ? "Nama terlalu pendek. Tulis minimal 2 huruf." : "Nama belum diisi."; field = "in-nama"; }
+    else if (!kelas) { err = "Kelas belum diisi. Contoh: 7A."; field = "in-kelas"; }
+    $("login-error").textContent = err;
+    $("login-error").hidden = !err;
+    ["in-nama", "in-kelas"].forEach((id) => $(id).setAttribute("aria-invalid", String(id === field)));
+    if (err) return $(field).focus();
+    user = { nama, kelas };
+    ls.set(K_USER, user);
+    ls.set(K_KELAS, kelas);
+    enterGame(false);
+  });
+
+  $("btn-keluar").addEventListener("click", () => {
+    user = null;
+    state = null;
+    ls.del(K_USER);
+    $("in-nama").value = "";
+    $("in-kelas").value = ls.get(K_KELAS, "");
+    $("login-error").hidden = true;
+    show("login");
+  });
+  $("btn-riwayat").addEventListener("click", () => show("riwayat"));
+  $("btn-main").addEventListener("click", () => { show("game"); render(); });
+  $("f-siapa").addEventListener("change", renderHistory);
+  $("f-kelas").addEventListener("change", renderHistory);
+  $("btn-csv").addEventListener("click", downloadCSV);
+  $("btn-hapus").addEventListener("click", () => {
+    $("hapus-text").textContent = `Hapus ${histRows.length} ronde yang sedang ditampilkan dari perangkat ini? Data yang sudah terhapus tidak bisa dikembalikan.`;
+    $("hapus-confirm").hidden = false;
+  });
+  $("btn-hapus-batal").addEventListener("click", () => { $("hapus-confirm").hidden = true; });
+  $("btn-hapus-ya").addEventListener("click", () => {
+    const ids = new Set(histRows.map((r) => r.id));
+    ls.set(K_HIST, loadHist().filter((r) => !ids.has(r.id)));
+    renderHistory();
+  });
 
   board.addEventListener("click", (e) => {
     const opt = e.target.closest(".opt");
@@ -1045,17 +1451,22 @@
     if (b) newRound(Number(b.dataset.level));
   });
   document.addEventListener("keydown", (e) => {
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (view !== "game" || !state || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) return;
     if (/^[1-4]$/.test(e.key) && !state.answered && !state.done) choose(Number(e.key) - 1);
     else if (e.key === "Enter" && state.answered && document.activeElement?.id !== "next") next();
   });
 
   function start(data) {
+    $("in-kelas").value = ls.get(K_KELAS, "");
+    const u = ls.get(K_USER, null);
+    if (!u || typeof u.nama !== "string" || typeof u.kelas !== "string") return show("login");
+    user = u;
     const s = data && data.state;
-    if (s && Number.isInteger(s.level) && LEVELS[s.level] && Array.isArray(s.qs) && s.qs.length === LEVELS[s.level].count) {
+    if (s && s.rec && Number.isInteger(s.level) && LEVELS[s.level] && Array.isArray(s.qs) && s.qs.length === LEVELS[s.level].count) {
       state = s;
-      render();
-    } else newRound(0);
+      enterGame(true);
+    } else enterGame(false);
   }
   window.claude?.hot?.snapshot?.(() => ({ state }));
   window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
