@@ -98,13 +98,29 @@
   }
 
   /* Header */
-  header { display: grid; gap: 6px; }
+  header { display: grid; gap: 10px; }
   .eyebrow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--accent);
+  }
+  .eyebrow span { white-space: nowrap; }
+  .eyebrow span + span::before {
+    content: "";
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    margin-right: 10px;
+    border-radius: 50%;
+    background: currentColor;
+    vertical-align: middle;
+    opacity: 0.6;
   }
   h1 {
     font-family: var(--display);
@@ -115,10 +131,23 @@
     text-wrap: balance;
   }
   h1 .hl {
-    background: linear-gradient(transparent 58%, var(--marker) 58%, var(--marker) 90%, transparent 90%);
-    padding-inline: 4px;
+    position: relative;
+    z-index: 0;
+    white-space: nowrap;
   }
-  .lede { margin: 4px 0 0; color: var(--muted); max-width: 60ch; }
+  h1 .hl::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: -0.08em;
+    right: -0.1em;
+    bottom: 0.1em;
+    height: 0.34em;
+    background: var(--marker);
+    border-radius: 0.12em;
+    transform: rotate(-1.5deg);
+  }
+  .lede { margin: 0; color: var(--muted); max-width: 60ch; }
 
   /* Toolbar */
   .toolbar {
@@ -345,8 +374,8 @@
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    margin-top: 10px;
-    padding: 10px 12px;
+    margin-top: 4px;
+    padding: 8px 8px 8px 14px;
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: 12px;
@@ -479,6 +508,8 @@
     .levels .t { font-size: 13.5px; }
     .levels .c { font-size: 11px; }
     .levels .lvl-bar i { width: 6px; }
+    .eyebrow { flex-direction: column; align-items: flex-start; gap: 2px; }
+    .eyebrow span + span::before { display: none; }
     .round summary { grid-template-columns: 1fr auto; }
     .r-date { grid-column: 1 / -1; }
     .hist-tools { align-items: stretch; }
@@ -492,7 +523,7 @@
 
 <div class="wrap">
   <header>
-    <span class="eyebrow">Berpikir Komputasional · Pengenalan Pola</span>
+    <span class="eyebrow"><span>Berpikir Komputasional</span><span>Pengenalan Pola</span></span>
     <h1>Detektif <span class="hl">Pola</span></h1>
     <p class="lede">Amati urutannya, temukan aturan yang berulang, lalu pilih yang mengisi kotak bertanda&nbsp;<b>?</b>. Ada 5 tingkat, masing-masing berisi 15–20 soal gambar, angka, dan huruf.</p>
     <div class="userbar" id="userbar" hidden>
