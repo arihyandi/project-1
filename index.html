@@ -508,6 +508,76 @@
   .ans-pick > span { display: inline-flex; align-items: center; gap: 6px; }
   .empty { margin: 0; padding: 18px; text-align: center; color: var(--muted); font-size: 14px; border: 1.5px dashed var(--line); border-radius: 12px; }
 
+  /* Raport */
+  #raport-body { display: grid; gap: 16px; }
+  .raport-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: start; gap: 12px; }
+  .raport-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .raport-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .sum-grade, .sum-box { background: var(--tile); border: 1.5px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+  .sum-grade { display: flex; align-items: center; gap: 14px; }
+  .sum-box { display: grid; align-content: start; gap: 2px; }
+  .label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .sum-title { display: block; font-family: var(--display); font-size: 22px; line-height: 1.15; }
+  .sum-num { font-family: var(--display); font-weight: 800; font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; }
+  .sum-num small { font-size: 0.5em; color: var(--muted); }
+  .sub { display: block; font-size: 12.5px; color: var(--muted); font-weight: 400; }
+  .grade {
+    display: inline-grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 18px;
+    line-height: 1;
+    vertical-align: middle;
+  }
+  .grade.big { width: 72px; height: 72px; border-radius: 18px; font-size: 46px; flex: none; }
+  .grade-a { background: var(--good); color: var(--card); }
+  .grade-b { background: var(--accent); color: var(--card); }
+  .grade-c { background: var(--marker); color: #17233A; }
+  .grade-d { background: var(--bad); color: var(--card); }
+  .table-wrap { overflow-x: auto; }
+  .raport-table, .rank-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .raport-table { min-width: 580px; }
+  .rank-table { min-width: 480px; }
+  .raport-table td:first-child b, .link { white-space: nowrap; }
+  .raport-table th, .rank-table th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 10px;
+    border-bottom: 1.5px solid var(--line);
+    white-space: nowrap;
+  }
+  .raport-table td, .rank-table td { padding: 10px; border-bottom: 1px dashed var(--line); vertical-align: middle; }
+  .raport-table tr:last-child td, .rank-table tr:last-child td { border-bottom: 0; }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .rank-table tr.me td { background: var(--tile); }
+  .rank-no { font-weight: 700; }
+  .link { font: 600 14px/1.3 var(--body); color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; text-align: left; text-decoration: underline; text-underline-offset: 3px; }
+  .link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  .pred-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 0; font-size: 13px; color: var(--muted); }
+  .pred-legend > span { display: inline-flex; align-items: center; gap: 6px; }
+  .pred-legend .grade { width: 22px; height: 22px; font-size: 13px; border-radius: 6px; }
+  .rank { display: grid; gap: 8px; border-top: 1.5px dashed var(--line); padding-top: 18px; }
+  .rank-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
+  .rank-head h3 { margin: 0; font-family: var(--display); font-size: 22px; }
+  .muted.small { font-size: 13px; }
+
+  @media print {
+    body { background: #fff; color: #000; }
+    .wrap > *:not(#view-raport):not(header), header .lede, header .userbar, header .eyebrow,
+    .raport-actions, .rank .muted.small { display: none !important; }
+    .board { box-shadow: none; border: 0; padding: 0; }
+    .detective { animation: none; }
+    .link { color: #000; text-decoration: none; }
+  }
+
   /* Teacher note */
   .note {
     display: grid;
@@ -635,6 +705,7 @@
       <span class="who" id="who"></span>
       <div class="userbar-actions">
         <button type="button" class="btn ghost sm" id="btn-main" hidden>Kembali bermain</button>
+        <button type="button" class="btn ghost sm" id="btn-raport">Raport</button>
         <button type="button" class="btn ghost sm" id="btn-riwayat">Riwayat</button>
         <button type="button" class="btn ghost sm" id="btn-keluar">Keluar</button>
       </div>
@@ -659,6 +730,32 @@
       <p class="form-error" id="login-error" role="alert" hidden></p>
       <button type="submit" class="btn" id="btn-masuk">Masuk dan mulai</button>
     </form>
+  </section>
+
+  <section class="board raport" id="view-raport" aria-labelledby="raport-title" hidden>
+    <div class="raport-top">
+      <div class="q-head">
+        <span class="chip">Raport</span>
+        <h2 class="prompt" id="raport-title">Raport Pengenalan Pola</h2>
+        <p class="muted" id="raport-who"></p>
+      </div>
+      <div class="raport-actions">
+        <button type="button" class="btn ghost sm" id="btn-raport-saya" hidden>Raport saya</button>
+        <button type="button" class="btn ghost sm" id="btn-cetak">Cetak raport</button>
+      </div>
+    </div>
+    <div id="raport-body"></div>
+    <div class="rank">
+      <div class="rank-head">
+        <h3>Peringkat kelas</h3>
+        <div class="field inline">
+          <label for="f-rank-kelas">Kelas</label>
+          <select id="f-rank-kelas"></select>
+        </div>
+      </div>
+      <p class="muted small">Diurutkan dari nilai akhir tertinggi, untuk siswa yang bermain di perangkat ini. Klik nama untuk melihat raportnya.</p>
+      <div class="table-wrap" id="rank-body"></div>
+    </div>
   </section>
 
   <section class="board history" id="view-riwayat" aria-labelledby="hist-title" hidden>
@@ -748,6 +845,7 @@
         <li>Tingkat berikutnya terkunci sampai siswa benar minimal 85% dari seluruh soal di tingkat sebelumnya (Tingkat 1: 13/15, Tingkat 2: 14/16, Tingkat 3: 15/17, Tingkat 4: 16/18).</li>
         <li>Buka <b>Riwayat → Semua siswa</b> untuk melihat jawaban seluruh siswa yang bermain di perangkat ini, lalu unduh sebagai CSV.</li>
         <li>Soal yang sulit bisa dilewati dulu. Nomor kuning di <b>Daftar soal</b> menandai soal yang dilewati. Pekerjaan tersimpan otomatis, jadi siswa bisa menutup halaman lalu melanjutkan lagi.</li>
+        <li>Buka <b>Raport</b> untuk melihat nilai akhir, predikat (A di atas 90, B di atas 80, C di atas 70, D 70 ke bawah), dan peringkat kelas.</li>
         <li>Pintasan: tombol <kbd>1</kbd>–<kbd>4</kbd> memilih jawaban, <kbd>Enter</kbd> lanjut.</li>
       </ul>
     </div>
@@ -1285,10 +1383,13 @@
     $("view-login").hidden = view !== "login";
     $("view-game").hidden = view !== "game";
     $("view-riwayat").hidden = view !== "riwayat";
+    $("view-raport").hidden = view !== "raport";
     $("userbar").hidden = view === "login";
-    $("btn-main").hidden = view !== "riwayat";
+    $("btn-main").hidden = view === "game" || view === "login";
     $("btn-riwayat").hidden = view === "riwayat";
+    $("btn-raport").hidden = view === "raport";
     if (view === "riwayat") renderHistory();
+    if (view === "raport") renderRaport();
     if (view === "login") $("in-nama").focus({ preventScroll: true });
   }
 
@@ -1496,12 +1597,14 @@
         <div class="row">
           <button type="button" class="btn" id="again">Main lagi</button>
           ${next !== null && unlocked(next) ? `<button type="button" class="btn ghost" id="up">Naik ke Tingkat ${next + 1} (${LEVELS[next].name})</button>` : ""}
+          <button type="button" class="btn ghost" id="to-raport">Lihat raport</button>
           <button type="button" class="btn ghost" id="to-hist">Lihat riwayat</button>
         </div>
       </div>`;
     $("again").onclick = () => newRound(state.level, true);
     if ($("up")) $("up").onclick = () => newRound(next);
     $("to-hist").onclick = () => show("riwayat");
+    $("to-raport").onclick = () => { raportOf = null; $("f-rank-kelas").dataset.chosen = ""; show("raport"); };
   }
 
   function clearFresh() {
@@ -1583,6 +1686,122 @@
     const k = nextOpen(state.i);
     if (k < 0) finish();
     else goTo(k);
+  }
+
+  // ---------- Raport ----------
+  // Predikat: di atas 90 = A, di atas 80 = B, di atas 70 = C, selain itu D.
+  function predikat(n) {
+    if (n > 90) return { g: "A", t: "Sangat baik", c: "a" };
+    if (n > 80) return { g: "B", t: "Baik", c: "b" };
+    if (n > 70) return { g: "C", t: "Cukup", c: "c" };
+    return { g: "D", t: "Perlu bimbingan", c: "d" };
+  }
+  let raportOf = null; // null = siswa yang sedang masuk
+
+  function reportFor(uk, hist) {
+    const rounds = hist.filter((r) => r.selesai && userKey(r) === uk);
+    const latest = rounds.reduce((a, r) => (!a || r.selesai > a.selesai ? r : a), null);
+    const levels = LEVELS.map((L, lv) => {
+      const rs = rounds.filter((r) => r.level === lv);
+      if (!rs.length) return { lv, tries: 0, nilai: 0 };
+      const best = rs.reduce((a, r) => (r.benar / r.total > a.benar / a.total ? r : a));
+      const nilai = nilaiOf(best.benar, best.total);
+      return { lv, tries: rs.length, benar: best.benar, total: best.total, nilai, lulus: best.benar >= need(lv), pred: predikat(nilai) };
+    });
+    const final = Math.round(levels.reduce((sum, l) => sum + l.nilai, 0) / LEVELS.length);
+    return {
+      uk, nama: latest ? latest.nama : "", kelas: latest ? latest.kelas : "", levels, final, pred: predikat(final),
+      done: levels.filter((l) => l.tries).length, passed: levels.filter((l) => l.lulus).length,
+      last: latest ? latest.selesai : null,
+    };
+  }
+
+  const gradeHTML = (p, big) => `<span class="grade grade-${p.c}${big ? " big" : ""}" title="${p.t}">${p.g}</span>`;
+
+  function renderRaport() {
+    const hist = loadHist();
+    const target = raportOf || { nama: user.nama, kelas: user.kelas };
+    const rp = reportFor(userKey(target), hist);
+    const isMe = userKey(target) === userKey(user);
+    $("btn-raport-saya").hidden = isMe;
+    $("raport-who").innerHTML = `<b>${esc(target.nama)}</b> · Kelas ${esc(target.kelas)} · dicetak ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}`;
+
+    const rows = rp.levels.map((l) => {
+      const L = LEVELS[l.lv];
+      const status = !l.tries
+        ? `<span class="pill open">Belum dikerjakan</span>`
+        : l.lulus ? `<span class="pill done">Lulus</span>` : `<span class="pill no">Belum lulus</span>`;
+      return `
+        <tr>
+          <td><b>Tingkat ${l.lv + 1}</b><span class="sub">${L.name}</span></td>
+          <td class="num">${l.tries}×</td>
+          <td class="num">${l.tries ? `${l.benar}/${l.total}` : "–"}</td>
+          <td class="num"><b>${l.tries ? l.nilai : "–"}</b></td>
+          <td>${l.tries ? gradeHTML(l.pred) : "–"}</td>
+          <td>${status}</td>
+        </tr>`;
+    }).join("");
+
+    const complete = rp.done === LEVELS.length;
+    $("raport-body").innerHTML = `
+      <div class="raport-summary">
+        <div class="sum-grade">
+          ${gradeHTML(rp.pred, true)}
+          <div>
+            <span class="label">Predikat akhir</span>
+            <b class="sum-title">${rp.pred.t}</b>
+          </div>
+        </div>
+        <div class="sum-box">
+          <span class="label">Nilai akhir</span>
+          <b class="sum-num">${rp.final}</b>
+          <span class="sub">Rata-rata nilai terbaik di 5 tingkat${complete ? "" : ". Tingkat yang belum dikerjakan bernilai 0"}.</span>
+        </div>
+        <div class="sum-box">
+          <span class="label">Tingkat lulus (≥85%)</span>
+          <b class="sum-num">${rp.passed}<small>/${LEVELS.length}</small></b>
+          <span class="sub">${complete ? "Semua tingkat sudah dikerjakan." : `Sudah dikerjakan ${rp.done} dari ${LEVELS.length} tingkat.`}</span>
+        </div>
+      </div>
+      ${rp.done ? "" : `<p class="empty">Belum ada ronde yang selesai. Selesaikan minimal satu ronde untuk mengisi raport.</p>`}
+      <div class="table-wrap">
+        <table class="raport-table">
+          <thead><tr><th>Tingkat</th><th>Percobaan</th><th>Benar terbaik</th><th>Nilai</th><th>Predikat</th><th>Status</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <p class="pred-legend">${[[95, "di atas 90"], [85, "di atas 80"], [75, "di atas 70"], [70, "70 ke bawah"]].map(([n, t]) => `<span>${gradeHTML(predikat(n))} ${predikat(n).t} (${t})</span>`).join("")}</p>`;
+
+    // Peringkat kelas
+    const sel = $("f-rank-kelas");
+    const kelasList = [...new Set(hist.filter((r) => r.selesai).map((r) => r.kelas))].sort();
+    if (!kelasList.includes(target.kelas)) kelasList.unshift(target.kelas);
+    const prev = sel.dataset.chosen || target.kelas;
+    sel.innerHTML = kelasList.map((k) => `<option value="${esc(k)}">${esc(k)}</option>`).join("");
+    sel.value = kelasList.includes(prev) ? prev : target.kelas;
+
+    const keys = [...new Set(hist.filter((r) => r.selesai && r.kelas === sel.value).map(userKey))];
+    const list = keys.map((k) => reportFor(k, hist))
+      .sort((a, b) => b.final - a.final || b.passed - a.passed || a.nama.localeCompare(b.nama, "id"));
+    let rank = 0;
+    const rankRows = list.map((r, i) => {
+      if (i === 0 || r.final !== list[i - 1].final || r.passed !== list[i - 1].passed) rank = i + 1;
+      const me = r.uk === userKey(target);
+      return `
+        <tr class="${me ? "me" : ""}">
+          <td class="num rank-no">${rank}</td>
+          <td><button type="button" class="link" data-uk="${esc(r.uk)}">${esc(r.nama)}</button></td>
+          <td class="num">${r.passed}/${LEVELS.length}</td>
+          <td class="num"><b>${r.final}</b></td>
+          <td>${gradeHTML(r.pred)}</td>
+        </tr>`;
+    }).join("");
+    $("rank-body").innerHTML = list.length
+      ? `<table class="rank-table">
+          <thead><tr><th>Peringkat</th><th>Nama</th><th>Tingkat lulus</th><th>Nilai akhir</th><th>Predikat</th></tr></thead>
+          <tbody>${rankRows}</tbody>
+        </table>`
+      : `<p class="empty">Belum ada siswa kelas ${esc(sel.value)} yang menyelesaikan ronde di perangkat ini.</p>`;
   }
 
   // ---------- Riwayat ----------
@@ -1703,6 +1922,8 @@
   $("btn-keluar").addEventListener("click", () => {
     user = null;
     state = null;
+    raportOf = null;
+    $("f-rank-kelas").dataset.chosen = "";
     ls.del(K_USER);
     $("in-nama").value = "";
     $("in-kelas").value = ls.get(K_KELAS, "");
@@ -1710,6 +1931,20 @@
     show("login");
   });
   $("btn-riwayat").addEventListener("click", () => show("riwayat"));
+  $("btn-raport").addEventListener("click", () => { raportOf = null; $("f-rank-kelas").dataset.chosen = ""; show("raport"); });
+  $("btn-raport-saya").addEventListener("click", () => { raportOf = null; $("f-rank-kelas").dataset.chosen = ""; renderRaport(); });
+  $("btn-cetak").addEventListener("click", () => { try { window.print(); } catch {} });
+  $("f-rank-kelas").addEventListener("change", (e) => { e.target.dataset.chosen = e.target.value; renderRaport(); });
+  $("rank-body").addEventListener("click", (e) => {
+    const b = e.target.closest("button.link");
+    if (!b) return;
+    const r = loadHist().find((x) => userKey(x) === b.dataset.uk);
+    if (!r) return;
+    raportOf = { nama: r.nama, kelas: r.kelas };
+    $("f-rank-kelas").dataset.chosen = r.kelas;
+    renderRaport();
+    $("view-raport").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
   $("btn-main").addEventListener("click", () => { show("game"); render(); });
   $("f-siapa").addEventListener("change", renderHistory);
   $("f-kelas").addEventListener("change", renderHistory);

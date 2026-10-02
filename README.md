@@ -28,6 +28,16 @@ Buka `index.html` di browser. Tidak perlu internet atau instalasi, kecuali untuk
 | 4 · Sulit | 18 | Perkalian, Fibonacci, bilangan kuadrat, operasi selang-seling, angka hilang di tengah, pola ganda hilang di tengah, huruf + angka (A1, C2, E3), huruf selang-seling (A, Z, B, Y), putaran 135° |
 | 5 · Sangat Sulit | 20 | Bilangan kubik, bilangan segitiga, bilangan prima, selisih berlipat, dua deret diselipkan, huruf bertumbuh, putaran + warna, dua operasi (×2 +1), pola ganda dan Fibonacci hilang di tengah |
 
+## Raport
+
+Tombol **Raport** menampilkan hasil keseluruhan siswa yang sedang masuk:
+
+- **Per tingkat:** jumlah percobaan, jumlah benar terbaik, nilai (0–100), predikat, dan status (Lulus jika benar ≥85%, Belum lulus, atau Belum dikerjakan).
+- **Nilai akhir:** rata-rata nilai terbaik di kelima tingkat. Tingkat yang belum dikerjakan bernilai 0.
+- **Predikat:** A (Sangat baik) untuk nilai di atas 90, B (Baik) di atas 80, C (Cukup) di atas 70, dan D (Perlu bimbingan) untuk 70 ke bawah.
+- **Peringkat kelas:** siswa sekelas yang bermain di perangkat yang sama, diurutkan dari nilai akhir tertinggi. Klik nama untuk membuka raport siswa tersebut.
+- **Cetak raport:** mencetak atau menyimpan raport sebagai PDF lewat dialog cetak browser.
+
 ## Riwayat jawaban
 
 Setiap jawaban otomatis tercatat: waktu, nama, kelas, tingkat, soal, jawaban siswa, kunci, dan benar/salah.
