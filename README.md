@@ -12,6 +12,9 @@ Buka `index.html` di browser. Tidak perlu internet atau instalasi, kecuali untuk
 - Siswa masuk dengan mengisi **nama** dan **kelas**. Tombol **Keluar** dipakai saat perangkat bergantian dengan siswa lain.
 - Pilih salah satu dari 5 tingkat. Soal dalam satu ronde dibuat acak, jadi setiap ronde berbeda.
 - Klik jawaban atau tekan tombol `1`–`4`. Tekan `Enter` untuk lanjut.
+- Soal yang sulit bisa dilewati dengan tombol **Lewati dulu**. **Daftar soal** menampilkan semua nomor: hijau (benar), merah (salah), kuning (dilewati), putih (belum). Klik nomor untuk kembali ke soal mana pun.
+- Pekerjaan tersimpan otomatis di perangkat. Jika halaman ditutup, siswa pindah tingkat, atau keluar lalu masuk lagi dengan nama dan kelas yang sama, pekerjaannya dilanjutkan dari posisi terakhir.
+- Ronde selesai saat semua soal sudah dijawab. Tombol **Selesai sekarang** menyelesaikan lebih awal, dan soal yang belum dijawab dihitung salah.
 - Setelah menjawab, muncul penjelasan aturan polanya.
 - Di akhir ronde ada skor, bintang (maksimal 3), dan skor terbaik per tingkat. Tombol naik tingkat muncul jika mendapat minimal 2 bintang (75% benar).
 
